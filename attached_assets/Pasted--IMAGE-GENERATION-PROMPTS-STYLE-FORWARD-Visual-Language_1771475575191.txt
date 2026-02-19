@@ -1,0 +1,184 @@
+# IMAGE GENERATION PROMPTS — STYLE FORWARD
+
+## Visual Language Guidelines
+
+**Color palette — vibrant but intentional:**
+
+- Primary: Electric violet (#7c3aed), hot coral (#ff6b6b), luminous cyan (#22d3ee)
+- Secondary: Deep ink (#0f172a), warm cream (#fef3c7), acid green (#a3e635)
+- Accent: Gold (#fbbf24), rose (#fb7185), electric blue (#3b82f6)
+- Use bold color blocking, not gradients — flat color with depth from overlap
+
+**Style references:**
+
+- Memphis design meets data visualization
+- Bauhaus geometry with contemporary color
+- Risograph texture and overprint effects
+- Editorial illustration for tech publications (The Verge, Wired, MIT Tech Review aesthetic)
+- NOT: Corporate minimalism, stock vector, generic tech imagery
+
+**Mood:** Confident, distinctive, intellectually playful, visually memorable
+
+-----
+
+## RESUME / LINKEDIN BANNER
+
+### Prompt: Professional Header — Bold Version
+
+```
+Bold geometric composition, Memphis design influence meets systems architecture. Overlapping shapes in electric violet, hot coral, and luminous cyan on deep ink background. Chunky geometric forms suggest modular components — circles, rectangles, irregular polygons — arranged in loose grid with intentional overlap creating color mixing effects. Thin gold lines connect elements suggesting flow and relationship. Risograph texture throughout. Confident, editorial, design-forward. No text, no icons. Aspect ratio 3:1 for LinkedIn banner.
+```
+
+### Prompt: Abstract Systems Banner
+
+```
+Dynamic horizontal composition of intersecting planes and pathways. Flat color blocks in coral, violet, and cyan create depth through layering — no gradients, only overlap. Geometric forms suggest orchestration: some elements contained within boundaries, others flowing between zones. Gold accent lines trace key pathways. Cream negative space punctuates the composition. Style: Bauhaus meets contemporary data art. Energetic but structured. Aspect ratio 3:1.
+```
+
+-----
+
+## OPTION A: Discovery/Networking Asset
+
+*For EY-type senior architect role networking — but make it memorable*
+
+### Prompt: Enterprise Architecture — Elevated
+
+```
+Isometric cityscape of abstract system architecture rendered in bold flat color. Three distinct elevation levels connected by dramatic diagonal pathways. Bottom level in deep violet with coral detail nodes. Middle orchestration layer in cyan with gold connection lines. Top strategic layer sparse, cream forms on ink background. Strong shadows (flat, not gradient) create depth. Memphis design geometry — playful shapes that still read as technical. Confident, sophisticated, impossible to ignore. Square format.
+```
+
+-----
+
+## OPTION B: Architect Roadmap Asset
+
+*For 24-month progression visualization*
+
+### Prompt: Growth Trajectory — Dynamic
+
+```
+Horizontal composition showing transformation through accumulation. Left side: scattered geometric primitives in muted violet, isolated, potential energy. Right side: same forms now interconnected, layered, emergent complexity in full color — coral, cyan, gold connections activated. The middle shows the transition: forms beginning to attract, connect, organize. Color intensifies left to right. Flat color, risograph texture, editorial illustration style. Suggests development through connection, not linear progression. Aspect ratio 2:1.
+```
+
+-----
+
+## OPTION C: Fit-Now Roles Asset
+
+*For AI Systems Designer positioning — distinctive*
+
+### Prompt: Interaction Architecture — Bold
+
+```
+Top-down view of nested interaction zones rendered in bold color blocking. Outer boundary in deep ink, inner zones in violet, coral, cyan — each layer a distinct flat color. Gold pathways cross zone boundaries at designed intersection points. Small acid green nodes mark interaction hotspots. Composition suggests control surfaces, designed constraints, intentional access points. Style: editorial infographic meets abstract expressionism. Cream background visible in strategic negative space. Square format.
+```
+
+-----
+
+## PORTFOLIO PROJECT 1: Enterprise Brand Governance Engine
+
+### Prompt: Cover Image — Constraint as Design
+
+```
+Abstract visualization of structured flow. Vibrant coral and violet flowing forms approach a central geometric framework in cyan and gold. The framework doesn't block — it redirects, channels, shapes. Flowing forms emerge transformed on the other side, more aligned, still energetic. Flat color, bold contrast, risograph overprint effects where colors overlap. Suggests governance as design intervention, not restriction. Black or deep ink background for drama. Square format.
+```
+
+### Prompt: Title Page — Validation Layers
+
+```
+Dramatic cross-section of a filtering system. Three bold horizontal bands: chaotic input zone (top) in mixed coral/violet, processing layer (middle) with precise cyan geometric structure, refined output zone (bottom) in harmonized gold tones. Vertical gold lines pierce all layers at checkpoint nodes marked with acid green. High contrast, flat color, strong graphic presence. Technical concept, editorial execution. Aspect ratio 16:9.
+```
+
+-----
+
+## PORTFOLIO PROJECT 2: Prompt Engineering Framework
+
+### Prompt: Cover Image — Composable Components
+
+```
+Grid of distinct geometric modules, each a different bold color (violet, coral, cyan, gold, acid green) with unique internal geometry. Some modules connected by thick black lines suggesting composition patterns. Each module clearly distinct yet part of a system. Style: specimen collection meets component library. Cream background with subtle dot grid. Playful but systematic. Suggests infinite combinatorial possibility from finite parts. Square format.
+```
+
+### Prompt: Title Page — Language as Structure
+
+```
+Dynamic horizontal flow: loose, organic coral forms enter from left, pass through a bold cyan and gold geometric processing framework at center, emerge as structured violet patterns on right. The transformation is visible — same elements, reorganized. Risograph texture, overprint color mixing where forms overlap framework. Movement and precision coexisting. Editorial illustration style. Aspect ratio 16:9.
+```
+
+-----
+
+## PORTFOLIO PROJECT 3: Multi-Engine Orchestration System
+
+### Prompt: Cover Image — Managed Complexity
+
+```
+Dense but organized node-cluster visualization. Five distinct engine clusters, each a different bold color (violet, coral, cyan, gold, acid green), each with unique internal pattern. Thick black pathways connect clusters, with rose-colored hub nodes at major intersections. Distributed architecture — no single center. Deep ink background makes colors pop. Complexity that rewards examination. Style: scientific illustration meets graphic design poster. Square format.
+```
+
+### Prompt: Title Page — Orchestration Flow
+
+```
+Side elevation of multi-engine system as bold graphic. Distinct vertical columns (engines) in violet, coral, cyan, gold — each with visible internal layers. Horizontal pathways in contrasting colors connect at multiple levels. Acid green handoff nodes glow at intersections. Input converges from left edge, output diverges to right. Flat color, strong silhouettes, architectural section meets album cover art. Aspect ratio 16:9.
+```
+
+-----
+
+## PORTFOLIO PROJECT 4: Cross-Platform AI Strategy
+
+### Prompt: Cover Image — Comparative Architecture
+
+```
+Five distinct structural systems arranged horizontally, each a different bold color (violet, coral, cyan, gold, acid green). Same overall purpose suggested by similar silhouette, but radically different internal architecture. Thin black lines connect at interface points — showing where systems could communicate. Style: comparative anatomy chart meets design systems documentation. Cream background. Analytical but visually striking. Square format.
+```
+
+### Prompt: Title Page — Strategic Portability
+
+```
+Central modular core in luminous gold, surrounded by partial framework outlines in violet, coral, cyan suggesting different platform contexts. The gold core clearly fits multiple frameworks but connects differently to each. Interface points marked in acid green. Suggests strategic choice, lock-in awareness, architectural optionality. Bold graphic style, flat color, high contrast on ink background. Aspect ratio 16:9.
+```
+
+-----
+
+## USAGE NOTES
+
+**Platform-specific modifiers:**
+
+**Midjourney:**
+
+```
+--ar 1:1 --style raw --s 750 --c 25
+Add to prompt: "risograph print texture, editorial illustration, flat color, bold graphic design, no gradients"
+```
+
+**DALL-E 3:**
+
+```
+Add to prompt: "in the style of editorial illustration for a design magazine, flat bold colors, risograph texture, Memphis design influence, graphic and confident"
+```
+
+**Stable Diffusion / Flux:**
+
+```
+Positive: editorial illustration, flat color, bold graphic design, risograph texture, Memphis design, high contrast, design magazine cover
+Negative: gradient, 3D render, photorealistic, corporate, stock vector, clip art, generic, muted colors, soft
+```
+
+**Ideogram:**
+
+```
+Add style reference: "Bold editorial illustration style, flat color blocking, risograph print aesthetic"
+```
+
+**Color hex codes for consistency:**
+
+- Electric violet: #7c3aed
+- Hot coral: #ff6b6b
+- Luminous cyan: #22d3ee
+- Deep ink: #0f172a
+- Warm cream: #fef3c7
+- Acid green: #a3e635
+- Gold: #fbbf24
+- Rose: #fb7185
+- Electric blue: #3b82f6
+
+**If outputs are too chaotic:** Add “organized composition, intentional negative space, clear visual hierarchy”
+
+**If outputs are too safe:** Add “confident, distinctive, design-forward, would appear in Wired magazine”
