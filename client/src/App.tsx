@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Zap, ArrowRight, ShieldCheck, Layers, Cpu, 
   Terminal, Database, Activity, Code2, Box,
-  ChevronRight, Monitor, Share2, Download, RefreshCcw, Loader2, Globe
+  ChevronRight, Monitor, Share2, Download, RefreshCcw, Loader2, Globe, Clock, Video
 } from 'lucide-react';
 import { Nav, Footer } from '@/components/Layout';
 import { 
@@ -11,6 +11,7 @@ import {
   SecureEnclave, FluxCapacitor, Glass, 
   SoftBtn, GravityDrop, QuantumToggle 
 } from '@/components/Toolkit';
+import Home from './pages/Home';
 
 // --- Page Components ---
 
@@ -127,13 +128,13 @@ const SystemsPage = () => {
 
         <div className="grid lg:grid-cols-3 gap-12">
           {[
-            { title: "Ingestion Layers", icon: <Database />, color: "text-violet-400", desc: "High-throughput data normalization using Memphis-style grouping." },
-            { title: "Inference Engines", icon: <Cpu />, color: "text-coral-400", desc: "Multi-model orchestration with weighted bias control." },
-            { title: "Governance Walls", icon: <ShieldCheck />, color: "text-green-400", desc: "Automated brand alignment checks via deterministic logic." }
+            { title: "Ingestion Layers", icon: <Database size={48} />, color: "text-violet-400", desc: "High-throughput data normalization using Memphis-style grouping." },
+            { title: "Inference Engines", icon: <Cpu size={48} />, color: "text-coral-400", desc: "Multi-model orchestration with weighted bias control." },
+            { title: "Governance Walls", icon: <ShieldCheck size={48} />, color: "text-green-400", desc: "Automated brand alignment checks via deterministic logic." }
           ].map((item, i) => (
             <div key={i} className="border-4 border-[#fef3c7]/20 p-10 hover:border-[#fbbf24] transition-all relative overflow-hidden group cursor-pointer bg-[#0f172a]">
               <div className={`mb-8 group-hover:scale-110 transition-transform duration-500 ${item.color}`}>
-                {React.cloneElement(item.icon as React.ReactElement, { size: 48 })}
+                {item.icon}
               </div>
               <h3 className="text-2xl font-black uppercase mb-4">{item.title}</h3>
               <p className="text-slate-400 leading-relaxed mb-8">{item.desc}</p>
@@ -234,9 +235,77 @@ const ToolkitPage = () => {
   );
 };
 
-// --- Main App ---
+const EventsPage = () => {
+  const events = [
+    { title: "Mastering Latent Spaces", type: "Free Webinar // Oct 28", color: "bg-[#c4ff00]", img: "/event-webinar.png", desc: "Learn to use generative tools to expand your traditional practice. 2-hour intensive." },
+    { title: "Portfolio Disruption", type: "1-on-1 // Design Consult", color: "bg-[#ff6b6b]", img: "/event-consult.png", desc: "Critical review of your current trajectory with senior nodes. Tailored advice." }
+  ];
 
-import Home from './Home';
+  return (
+    <div className="pt-32 pb-24 px-6 min-h-screen bg-white">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-20 border-b-4 border-black pb-8">
+          <h1 className="kinetic-text text-7xl uppercase">Node<br/>Events</h1>
+          <p className="text-gray-500 font-bold uppercase tracking-widest mt-4">Sync cycles and architectural deep-dives</p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+          <div className="lg:col-span-8 space-y-12">
+            {events.map((event, idx) => (
+              <div key={idx} className={`brutalist-border p-12 flex flex-col md:flex-row gap-12 group cursor-pointer hover:bg-black hover:text-white transition-all ${idx === 1 ? 'bg-[#0f172a] text-[#fef3c7]' : 'bg-[#f8f8f8]'}`}>
+                <div className="w-full md:w-1/3 aspect-square glass-card rounded-none overflow-hidden border-2 border-black">
+                  <img src={event.img} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" alt={event.title} />
+                </div>
+                <div className="flex-1 flex flex-col justify-between">
+                  <div>
+                    <span className={`${event.color} text-black px-3 py-1 text-[10px] font-black uppercase mb-4 inline-block`}>{event.type}</span>
+                    <h2 className="text-5xl font-black uppercase leading-none mb-4">{event.title}</h2>
+                    <p className="font-medium opacity-70">{event.desc}</p>
+                  </div>
+                  <button className="mt-8 self-start flex items-center gap-4 font-black uppercase group-hover:gap-6 transition-all">
+                    Book My Spot <ArrowRight />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="lg:col-span-4 space-y-8">
+            <div className="glass-card p-8 bg-gray-50 border-black/10 text-black">
+              <h3 className="font-black uppercase text-sm mb-6 flex items-center gap-2">
+                <Clock className="w-4 h-4" /> Node Timeline
+              </h3>
+              <div className="space-y-6">
+                {[
+                  { time: '14:00', event: 'Node Check-in', type: 'Daily' },
+                  { time: '16:30', event: 'WebGL Workshop', type: 'Pro' },
+                  { time: '19:00', event: 'Artist Mixer', type: 'Social' }
+                ].map((item, idx) => (
+                  <div key={idx} className="flex gap-4 items-start pb-6 border-b border-black/5">
+                    <span className="font-black text-xs text-[#ff6b6b]">{item.time}</span>
+                    <div>
+                      <h4 className="font-black uppercase text-xs">{item.event}</h4>
+                      <p className="text-[10px] font-bold text-gray-400 uppercase">{item.type}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="brutalist-border p-8 bg-black text-white">
+              <Video className="w-10 h-10 mb-4 text-[#c4ff00]" />
+              <h3 className="font-black uppercase text-xl leading-none mb-4">Archive<br/>Access</h3>
+              <p className="text-xs font-medium text-gray-400 mb-6">Missed a sync? Access all previous recordings in the node vault.</p>
+              <button className="text-xs font-black uppercase underline decoration-2 underline-offset-4 hover:text-[#c4ff00]">Enter Vault</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// --- Main App ---
 
 export default function App() {
   const [page, setPage] = useState('home');
@@ -261,7 +330,8 @@ export default function App() {
             {page === 'systems' && <SystemsPage />}
             {page === 'forge' && <ForgePage />}
             {page === 'toolkit' && <ToolkitPage />}
-            {['events'].includes(page) && (
+            {page === 'events' && <EventsPage />}
+            {['submit'].includes(page) && (
               <div className="pt-40 text-center min-h-screen">
                 <h1 className="kinetic-text text-8xl uppercase">Coming<br/>Soon</h1>
                 <button onClick={() => setPage('home')} className="mt-8 underline font-black uppercase tracking-widest text-xs">Return Home</button>
