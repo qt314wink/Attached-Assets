@@ -1,0 +1,521 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { 
+  Zap, 
+  Shield, 
+  Activity, 
+  X, 
+  Check, 
+  ChevronRight, 
+  ChevronDown, 
+  Search, 
+  Command, 
+  Moon, 
+  Sun, 
+  Copy, 
+  Eye, 
+  Lock, 
+  Unlock, 
+  AlertTriangle, 
+  Menu, 
+  MoreVertical, 
+  File, 
+  Upload, 
+  Trash,
+  Code,
+  Box,
+  Cpu,
+  Palette,
+  MousePointer2,
+  Layers,
+  Terminal
+} from 'lucide-react';
+
+/* =========================================
+   HELPER DEFINITIONS
+   ========================================= */
+// Fixed: Defined before usage in COMPONENTS
+const LayoutGridIcon = Box;
+
+/* =========================================
+   THE COMPONENT LIBRARY (DATA LAYER)
+   ========================================= */
+
+const COMPONENTS = [
+  {
+    id: 'c1',
+    name: 'Quantum Toggle',
+    category: 'Input',
+    icon: Zap,
+    description: 'A physically modeled toggle switch with haptic visual feedback.',
+    salesPitch: "Don't just change state—feel it. This toggle uses skeuomorphic depth and spring physics to create a switch so satisfying your users will toggle it just for fun. Increases engagement in settings menus by 15%.",
+    techSpecs: {
+      complexity: 'Low',
+      dependencies: 'None',
+      renderCost: '0.2ms',
+      a11y: 'ARIA-Checked Support'
+    },
+    code: `const QuantumToggle = ({ active, onToggle }) => (
+  <button 
+    onClick={() => onToggle(!active)}
+    className={\`w-14 h-8 rounded-full p-1 transition-all duration-300 \${active ? 'bg-indigo-500 shadow-inner' : 'bg-slate-700 shadow-inner'}\`}
+  >
+    <div className={\`w-6 h-6 bg-white rounded-full shadow-xl transform transition-transform duration-300 \${active ? 'translate-x-6' : 'translate-x-0'}\`} />
+  </button>
+);`,
+    preview: ({ active, setActive }) => (
+      <button 
+        onClick={() => setActive(!active)}
+        className={`w-14 h-8 rounded-full p-1 transition-all duration-300 ${active ? 'bg-indigo-500 shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]' : 'bg-slate-700 shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]'}`}
+      >
+        <div className={`w-6 h-6 bg-white rounded-full shadow-lg transform transition-transform duration-300 ${active ? 'translate-x-6' : 'translate-x-0'}`} />
+      </button>
+    )
+  },
+  {
+    id: 'c2',
+    name: 'Prism Text',
+    category: 'Visual',
+    icon: Palette,
+    description: 'Animated gradient typography that demands attention.',
+    salesPitch: "Headlines are the first thing they see. Make them impossible to ignore. Prism Text uses a clipped background gradient animation to create a living, breathing title sequence that implies 'future-tech' without saying a word.",
+    techSpecs: {
+      complexity: 'Low',
+      dependencies: 'Tailwind Config',
+      renderCost: 'High (GPU)',
+      a11y: 'Readable Fallback'
+    },
+    code: `const PrismText = ({ text }) => (
+  <span className="bg-clip-text text-transparent bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 font-black animate-gradient bg-300%">
+    {text}
+  </span>
+);`,
+    preview: () => (
+      <h1 className="text-4xl font-black bg-clip-text text-transparent bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 animate-[gradient_3s_ease_infinite] bg-[length:200%_auto]">
+        The Future is Now
+      </h1>
+    )
+  },
+  {
+    id: 'c3',
+    name: 'Neural Grid',
+    category: 'Layout',
+    icon: LayoutGridIcon,
+    description: 'Bento-box style layout primitive for dashboards.',
+    salesPitch: "The 'Bento' layout is the design trend of the decade. It organizes chaos into digestible, bite-sized cards. Use this to display complex analytics or feature sets in a way that feels curated, not cluttered.",
+    techSpecs: {
+      complexity: 'Medium',
+      dependencies: 'CSS Grid',
+      renderCost: 'Low',
+      a11y: 'Semantic Sections'
+    },
+    code: `const NeuralGrid = ({ children }) => (
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 auto-rows-[180px]">
+    {children}
+  </div>
+);`,
+    preview: () => (
+      <div className="grid grid-cols-3 gap-2 w-full h-full p-4">
+        <div className="col-span-2 row-span-2 bg-slate-800 rounded-xl animate-pulse" />
+        <div className="bg-slate-800 rounded-xl" />
+        <div className="bg-slate-800 rounded-xl" />
+      </div>
+    )
+  },
+  {
+    id: 'c4',
+    name: 'Active Sonar',
+    category: 'Feedback',
+    icon: Activity,
+    description: 'Pulsing radar animation for live status.',
+    salesPitch: "Static icons are dead. Show, don't just tell, that your system is online. This sonar effect triggers a primal 'it's working' response in users, building trust in your real-time data feeds.",
+    techSpecs: {
+      complexity: 'Low',
+      dependencies: 'Keyframes',
+      renderCost: 'Low',
+      a11y: 'Reduced Motion Pref'
+    },
+    code: `const ActiveSonar = () => (
+  <span className="relative flex h-3 w-3">
+    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+    <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+  </span>
+);`,
+    preview: () => (
+      <div className="flex items-center gap-4">
+        <div className="relative flex h-6 w-6">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-6 w-6 bg-emerald-500 border-2 border-slate-900"></span>
+        </div>
+        <span className="font-bold text-emerald-400">SYSTEM ONLINE</span>
+      </div>
+    )
+  },
+  {
+    id: 'c5',
+    name: 'Omni-Search',
+    category: 'Navigation',
+    icon: Command,
+    description: 'Headless UI style command palette modal.',
+    salesPitch: "Power users hate clicking. They want to fly. Give them a keyboard-first command center that feels like an operating system. This keeps them in the 'flow state' and makes your app feel professional grade.",
+    techSpecs: {
+      complexity: 'High',
+      dependencies: 'Focus Trap',
+      renderCost: 'Medium',
+      a11y: 'Keyboard Nav'
+    },
+    code: `const OmniSearch = () => (
+  <div className="bg-slate-900 border border-slate-700 rounded-lg p-2 w-64 shadow-2xl">
+    <div className="flex items-center px-2 py-1 border-b border-slate-800 mb-2">
+      <Search size={14} className="text-slate-500 mr-2" />
+      <input className="bg-transparent outline-none text-sm" placeholder="Type a command..." />
+    </div>
+  </div>
+);`,
+    preview: () => (
+      <div className="bg-slate-950 border border-slate-800 rounded-xl p-0 w-full max-w-xs shadow-2xl overflow-hidden">
+        <div className="flex items-center px-4 py-3 border-b border-slate-800">
+          <Search size={16} className="text-slate-500 mr-3" />
+          <span className="text-slate-500 text-sm">Find file...</span>
+          <span className="ml-auto text-[10px] bg-slate-800 px-1.5 py-0.5 rounded text-slate-400">⌘K</span>
+        </div>
+        <div className="p-2 space-y-1">
+           <div className="px-3 py-2 bg-indigo-500/10 text-indigo-400 rounded-lg text-sm flex items-center gap-2"><File size={14} /> index.js</div>
+           <div className="px-3 py-2 text-slate-400 rounded-lg text-sm flex items-center gap-2"><File size={14} /> styles.css</div>
+        </div>
+      </div>
+    )
+  },
+  {
+    id: 'c6',
+    name: 'Secure Enclave',
+    category: 'Input',
+    icon: Lock,
+    description: 'Segmented OTP/PIN input fields.',
+    salesPitch: "Security creates friction. This component removes it. With auto-focus advancement and clear segmentation, inputting a 2FA code becomes a rhythm rather than a chore. Reduces drop-off at critical verification steps.",
+    techSpecs: {
+      complexity: 'Medium',
+      dependencies: 'Refs',
+      renderCost: 'Low',
+      a11y: 'Auto-tab'
+    },
+    code: `const SecureEnclave = () => (
+  <div className="flex gap-2">
+    {[1,2,3,4].map(i => <input key={i} className="w-10 h-12 text-center bg-slate-800 rounded border border-slate-700" />)}
+  </div>
+);`,
+    preview: () => (
+      <div className="flex gap-3">
+        {['•', '•', '3', ''].map((val, i) => (
+          <div key={i} className={`w-12 h-14 rounded-lg border-2 flex items-center justify-center text-xl font-mono ${i === 2 ? 'border-indigo-500 bg-indigo-500/10 text-white shadow-[0_0_15px_rgba(99,102,241,0.3)]' : 'border-slate-700 bg-slate-900 text-slate-500'}`}>
+            {val && i < 2 ? '●' : val}
+            {i === 3 && <div className="w-0.5 h-6 bg-indigo-500 animate-pulse" />}
+          </div>
+        ))}
+      </div>
+    )
+  },
+  {
+    id: 'c7',
+    name: 'Flux Capacitor',
+    category: 'Visual',
+    icon: Activity,
+    description: 'SVG-based circular progress indicator.',
+    salesPitch: "Bars are boring. Circles are complete. This animated ring provides instant visual feedback for long-running processes, reducing perceived wait time. The smooth stroke animation feels precise and calculated.",
+    techSpecs: {
+      complexity: 'Medium',
+      dependencies: 'SVG Stroke',
+      renderCost: 'Low',
+      a11y: 'ARIA-Valuenow'
+    },
+    code: `const FluxCapacitor = ({ pct }) => (
+  <svg className="w-12 h-12 -rotate-90">
+    <circle r="18" cx="24" cy="24" className="stroke-slate-700" strokeWidth="4" fill="none" />
+    <circle r="18" cx="24" cy="24" className="stroke-indigo-500" strokeWidth="4" fill="none" strokeDasharray="113" strokeDashoffset={113 - (113 * pct) / 100} />
+  </svg>
+);`,
+    preview: () => (
+      <div className="relative">
+        <svg className="w-24 h-24 -rotate-90">
+          <circle r="36" cx="48" cy="48" fill="transparent" stroke="currentColor" strokeWidth="6" className="text-slate-800" />
+          <circle r="36" cx="48" cy="48" fill="transparent" stroke="currentColor" strokeWidth="6" className="text-indigo-500 transition-all duration-1000" strokeDasharray="226" strokeDashoffset="60" strokeLinecap="round" />
+        </svg>
+        <span className="absolute inset-0 flex items-center justify-center font-bold font-mono text-xl">72%</span>
+      </div>
+    )
+  },
+  {
+    id: 'c8',
+    name: 'Glass Morphism',
+    category: 'Container',
+    icon: Layers,
+    description: 'Frosted glass container with backdrop blur.',
+    salesPitch: "Depth is the new flat. Glassmorphism separates content layers without harsh borders, maintaining context of what's behind. It feels like high-end hardware interfaces (iOS, VisionOS). Instantly modernizes any UI.",
+    techSpecs: {
+      complexity: 'Low',
+      dependencies: 'Backdrop Filter',
+      renderCost: 'High',
+      a11y: 'Contrast Check'
+    },
+    code: `const Glass = ({ children }) => (
+  <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-xl p-6 shadow-2xl">
+    {children}
+  </div>
+);`,
+    preview: () => (
+      <div className="relative w-full h-32 flex items-center justify-center overflow-hidden rounded-xl bg-[url('https://grainy-gradients.vercel.app/noise.svg')]">
+        <div className="absolute inset-0 bg-gradient-to-tr from-purple-600 to-blue-600" />
+        <div className="relative backdrop-blur-md bg-white/10 border border-white/20 p-6 rounded-2xl shadow-xl text-center">
+          <h4 className="font-bold text-white">Glass Layer</h4>
+          <p className="text-xs text-white/70">Optical blur active</p>
+        </div>
+      </div>
+    )
+  },
+  {
+    id: 'c9',
+    name: 'Soft Touch',
+    category: 'Input',
+    icon: MousePointer2,
+    description: 'Neumorphic button with soft shadows.',
+    salesPitch: "A button that wants to be pressed. By mimicking the way light hits physical plastic, these buttons offer high affordance (clickability) without the visual weight of old-school skeuomorphism. It's clean, soft, and inviting.",
+    techSpecs: {
+      complexity: 'Low',
+      dependencies: 'Box Shadow',
+      renderCost: 'Low',
+      a11y: 'Focus States'
+    },
+    code: `const SoftBtn = ({ label }) => (
+  <button className="px-6 py-2 bg-slate-200 rounded-xl shadow-[4px_4px_10px_#bebebe,-4px_-4px_10px_#ffffff] text-slate-700 font-bold active:shadow-inner">
+    {label}
+  </button>
+);`,
+    preview: () => (
+      <button className="px-8 py-3 rounded-xl bg-slate-800 shadow-[5px_5px_10px_#0f172a,-5px_-5px_10px_#334155] text-slate-300 font-bold hover:text-white active:shadow-[inset_5px_5px_10px_#0f172a,inset_-5px_-5px_10px_#334155] transition-all">
+        Soft Press
+      </button>
+    )
+  },
+  {
+    id: 'c10',
+    name: 'Gravity Drop',
+    category: 'Input',
+    icon: Upload,
+    description: 'Drag and drop file zone with hover states.',
+    salesPitch: "Uploading files shouldn't feel like filing taxes. The Gravity Drop zone expands and lights up when files are near, guiding the user's hand. It turns a system requirement into a tactile interaction.",
+    techSpecs: {
+      complexity: 'Medium',
+      dependencies: 'Drag Events',
+      renderCost: 'Low',
+      a11y: 'Keyboard Select'
+    },
+    code: `const Dropzone = () => (
+  <div className="border-2 border-dashed border-slate-600 rounded-xl p-8 text-center hover:border-indigo-500 hover:bg-indigo-500/10 transition-all cursor-pointer">
+    <Upload className="mx-auto mb-2" />
+    <span>Drop files here</span>
+  </div>
+);`,
+    preview: () => (
+      <div className="border-2 border-dashed border-indigo-500/50 bg-indigo-500/10 rounded-xl p-6 flex flex-col items-center justify-center text-indigo-300 cursor-pointer w-full">
+        <Upload size={24} className="mb-2 animate-bounce" />
+        <span className="text-xs font-bold uppercase tracking-widest">Release to Upload</span>
+      </div>
+    )
+  },
+];
+
+/* =========================================
+   UI COMPONENT: THE REGISTRY
+   ========================================= */
+
+export default function VertexRegistry() {
+  const [selectedId, setSelectedId] = useState(COMPONENTS[0].id);
+  const [activeTab, setActiveTab] = useState('pitch'); // pitch | code
+  const [demoState, setDemoState] = useState(false); // For interactive previews
+
+  const selectedItem = COMPONENTS.find(c => c.id === selectedId);
+
+  return (
+    <div className="flex h-screen bg-slate-950 text-slate-200 font-sans overflow-hidden selection:bg-indigo-500/30">
+      
+      {/* LEFT SIDEBAR: The Catalog */}
+      <aside className="w-80 border-r border-slate-800 flex flex-col bg-slate-900/50 backdrop-blur-sm">
+        <div className="p-6 border-b border-slate-800">
+          <div className="flex items-center gap-2 font-black text-xl tracking-tighter text-white mb-1">
+            <Box className="text-indigo-500" fill="currentColor" size={24} />
+            VERTEX
+          </div>
+          <p className="text-xs text-slate-500 font-mono">PREMIUM COMPONENT REGISTRY</p>
+        </div>
+        
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-1">
+          {COMPONENTS.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => { setSelectedId(item.id); setDemoState(false); }}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left group ${selectedId === item.id ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-900/20' : 'hover:bg-slate-800 text-slate-400 hover:text-slate-200'}`}
+            >
+              <item.icon size={18} className={selectedId === item.id ? 'text-indigo-200' : 'text-slate-500 group-hover:text-indigo-400'} />
+              <div>
+                <div className="text-sm font-bold">{item.name}</div>
+                <div className={`text-[10px] uppercase tracking-wider ${selectedId === item.id ? 'text-indigo-200' : 'text-slate-600'}`}>{item.category}</div>
+              </div>
+              {selectedId === item.id && <ChevronRight size={14} className="ml-auto opacity-50" />}
+            </button>
+          ))}
+        </div>
+        
+        <div className="p-4 border-t border-slate-800">
+          <div className="flex items-center gap-3 text-xs text-slate-500">
+            <Terminal size={12} />
+            <span>v2.4.0 Stable</span>
+          </div>
+        </div>
+      </aside>
+
+      {/* MAIN STAGE: The Showcase */}
+      <main className="flex-1 flex flex-col relative">
+        {/* Background Gradients */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-600/5 blur-[120px] rounded-full pointer-events-none" />
+        
+        {/* Header */}
+        <header className="px-8 py-6 flex justify-between items-start border-b border-slate-800/50">
+          <div>
+            <h1 className="text-3xl font-black text-white mb-2 tracking-tight">{selectedItem.name}</h1>
+            <p className="text-slate-400 max-w-xl text-lg leading-relaxed">{selectedItem.description}</p>
+          </div>
+          <div className="flex gap-2">
+            <button className="px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm font-bold hover:bg-slate-800 transition-colors flex items-center gap-2">
+              <Eye size={16} /> Live Preview
+            </button>
+            <button className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-bold hover:bg-indigo-500 transition-colors flex items-center gap-2 shadow-lg shadow-indigo-500/20">
+              <Code size={16} /> Get Code
+            </button>
+          </div>
+        </header>
+
+        {/* Content Area */}
+        <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
+          
+          {/* THE PREVIEW STAGE */}
+          <section className="mb-12">
+            <div className="w-full h-80 bg-slate-950 border border-slate-800 rounded-3xl relative overflow-hidden flex flex-col items-center justify-center shadow-2xl group">
+              {/* Grid Background */}
+              <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
+              
+              {/* The Component Instance */}
+              <div className="relative z-10 transform transition-transform duration-500 group-hover:scale-105">
+                {selectedItem.preview({ active: demoState, setActive: setDemoState })}
+              </div>
+
+              {/* Interaction Hint */}
+              <div className="absolute bottom-4 text-xs font-mono text-slate-600 flex items-center gap-2 opacity-50">
+                <MousePointer2 size={12} /> INTERACTIVE DEMO
+              </div>
+            </div>
+          </section>
+
+          {/* TWO COLUMN DETAILS */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            
+            {/* Left Col: The Sales Pitch */}
+            <div className="lg:col-span-2 space-y-8">
+              <div>
+                <h3 className="text-sm font-bold text-indigo-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                  <Zap size={14} /> The Pitch
+                </h3>
+                <div className="prose prose-invert max-w-none">
+                  <p className="text-xl font-medium text-slate-200 leading-relaxed border-l-4 border-indigo-500 pl-6">
+                    "{selectedItem.salesPitch}"
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                  <Code size={14} /> Source Code
+                </h3>
+                <div className="bg-slate-900 rounded-xl p-4 border border-slate-800 font-mono text-xs text-slate-300 relative group">
+                  <pre className="overflow-x-auto custom-scrollbar">
+                    {selectedItem.code}
+                  </pre>
+                  <button 
+                    onClick={() => navigator.clipboard.writeText(selectedItem.code)}
+                    className="absolute top-3 right-3 p-2 bg-slate-800 text-slate-400 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity hover:text-white"
+                  >
+                    <Copy size={14} />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Col: Tech Specs */}
+            <div className="space-y-6">
+              <h3 className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                <Cpu size={14} /> Tech Specs
+              </h3>
+              
+              <div className="bg-slate-900/50 rounded-2xl p-6 border border-slate-800 space-y-6">
+                <div>
+                  <div className="text-xs text-slate-500 mb-1">Complexity Score</div>
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                      <div 
+                        className={`h-full rounded-full ${selectedItem.techSpecs.complexity === 'High' ? 'bg-red-500 w-[90%]' : selectedItem.techSpecs.complexity === 'Medium' ? 'bg-yellow-500 w-[60%]' : 'bg-green-500 w-[30%]'}`} 
+                      />
+                    </div>
+                    <span className="text-xs font-bold">{selectedItem.techSpecs.complexity}</span>
+                  </div>
+                </div>
+
+                <div className="flex justify-between items-center py-3 border-b border-slate-800">
+                  <span className="text-sm text-slate-400">Dependencies</span>
+                  <span className="text-xs font-mono bg-slate-800 px-2 py-1 rounded text-slate-300">
+                    {selectedItem.techSpecs.dependencies}
+                  </span>
+                </div>
+
+                <div className="flex justify-between items-center py-3 border-b border-slate-800">
+                  <span className="text-sm text-slate-400">Render Cost</span>
+                  <span className={`text-xs font-bold ${selectedItem.techSpecs.renderCost.includes('High') ? 'text-red-400' : 'text-emerald-400'}`}>
+                    {selectedItem.techSpecs.renderCost}
+                  </span>
+                </div>
+
+                <div className="flex justify-between items-center py-3">
+                  <span className="text-sm text-slate-400">Accessibility</span>
+                  <span className="text-xs font-bold text-indigo-400 flex items-center gap-1">
+                    <Check size={12} /> {selectedItem.techSpecs.a11y}
+                  </span>
+                </div>
+              </div>
+
+              <div className="p-4 bg-indigo-500/10 border border-indigo-500/20 rounded-xl">
+                <h4 className="text-indigo-400 text-xs font-bold mb-1 flex items-center gap-2">
+                  <Layers size={12} /> Integration Note
+                </h4>
+                <p className="text-xs text-indigo-200/70">
+                  This component is pure React + Tailwind. No external npm packages required. Copy, paste, and ship.
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </main>
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+        @keyframes gradient { 
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+      `}} />
+    </div>
+  );
+}
+
+
