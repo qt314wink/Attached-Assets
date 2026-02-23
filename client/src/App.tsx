@@ -104,8 +104,20 @@ const ForgePage = () => {
     if (!prompt && !file) return;
     setLoading(true);
     setGlitch(true);
+    
+    // Logic to select appropriate mock image based on preset
+    const getMockImage = (preset: string) => {
+      switch(preset) {
+        case 'comic_reel': return "/comic-reel.png";
+        case 'social_pack': return "/social-pack.png";
+        case 'art_scene': return "/comic-reel.png";
+        case 'brand_pack': return "/social-pack.png";
+        default: return "/hero-art.png";
+      }
+    };
+
     setTimeout(() => {
-      setImg("/hero-art.png");
+      setImg(getMockImage(selectedPreset));
       setLoading(false);
       setGlitch(false);
     }, 2500);
