@@ -40,7 +40,13 @@ const ANALYZE_VARIABLES = [
 
 const OUTPUT_PRESETS = [
   { id: 'brand_pack', label: 'Brand Pack', icon: <Briefcase size={14}/> },
+  { id: 'social_pack', label: 'Social Media Pack', icon: <Share2 size={14}/> },
   { id: 'hero', label: 'Hero/Post', icon: <ImageIcon size={14}/> },
+  { id: 'art_scene', label: 'Art/Story Scene', icon: <Palette size={14}/> },
+  { id: 'comic_reel', label: 'Comic Reel', icon: <Video size={14}/> },
+  { id: 'infographic', label: 'Infographic', icon: <Activity size={14}/> },
+  { id: 'pins', label: 'Pins/Posts', icon: <Target size={14}/> },
+  { id: 'guides', label: 'Guides/Manuals', icon: <FileText size={14}/> },
   { id: 'web_layout', label: 'Web Layout', icon: <Layout size={14}/> },
   { id: 'app_layout', label: 'App Layout', icon: <Presentation size={14}/> },
   { id: 'symbols', label: 'Symbols/Icons', icon: <Sparkles size={14}/> },
