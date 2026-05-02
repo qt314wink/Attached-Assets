@@ -1,181 +1,308 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Activity, Heart, Hand, Eye, Wind, MousePointer2 } from 'lucide-react';
+import { ArrowLeft, HeartPulse, Wind, Waves, Activity, Zap, Brain } from 'lucide-react';
+
+const SOMATIC_STATES = {
+  ventral: {
+    id: 'ventral',
+    name: 'Ventral Vagal',
+    alias: 'Safe & Social',
+    description: 'Relaxation and social connection; the ideal state for creative engagement.',
+    color: '#10b981', // emerald
+    audioFreq: 432,
+    visuals: {
+      blur: 20,
+      speed: 4,
+      scale: [1, 1.05, 1],
+      path: 'M 20 50 Q 50 10 80 50 T 140 50'
+    }
+  },
+  sympathetic: {
+    id: 'sympathetic',
+    name: 'Sympathetic',
+    alias: 'Activation',
+    description: 'The "fight-or-flight" response triggered by jarring visual shifts or stressors.',
+    color: '#ef4444', // red
+    audioFreq: 852,
+    visuals: {
+      blur: 5,
+      speed: 0.5,
+      scale: [0.95, 1.1, 0.95],
+      path: 'M 20 50 L 40 20 L 60 80 L 80 10 L 100 90 L 120 40 L 140 50'
+    }
+  },
+  dorsal: {
+    id: 'dorsal',
+    name: 'Dorsal Vagal',
+    alias: 'Shutdown',
+    description: 'Immobilization or dissociation occurring when overwhelmed by chaos.',
+    color: '#3b82f6', // blue
+    audioFreq: 174,
+    visuals: {
+      blur: 40,
+      speed: 8,
+      scale: [0.98, 1, 0.98],
+      path: 'M 20 50 L 140 50'
+    }
+  }
+};
+
+let audioCtx: AudioContext | undefined;
+let currentOsc: OscillatorNode | undefined;
+let currentGain: GainNode | undefined;
+
+const playSomaticSound = (state: keyof typeof SOMATIC_STATES) => {
+  if (typeof window === 'undefined') return;
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+  }
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+
+  if (currentOsc) {
+    currentOsc.stop();
+    currentOsc.disconnect();
+  }
+  if (currentGain) {
+    currentGain.disconnect();
+  }
+
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+
+  const freq = SOMATIC_STATES[state].audioFreq;
+  
+  if (state === 'ventral') {
+    osc.type = 'sine';
+    gain.gain.value = 0.1;
+  } else if (state === 'sympathetic') {
+    osc.type = 'sawtooth';
+    gain.gain.value = 0.05;
+  } else if (state === 'dorsal') {
+    osc.type = 'sine';
+    gain.gain.value = 0.2;
+    // deep low freq
+  }
+
+  osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+  osc.start();
+
+  currentOsc = osc;
+  currentGain = gain;
+};
+
+const stopSound = () => {
+  if (currentOsc) {
+    currentGain?.gain.exponentialRampToValueAtTime(0.001, audioCtx!.currentTime + 1);
+    setTimeout(() => {
+      currentOsc?.stop();
+      currentOsc?.disconnect();
+      currentGain?.disconnect();
+    }, 1000);
+  }
+};
 
 export default function SomaticModule({ setPage }: { setPage: (p: string) => void }) {
-  const [somatic, setSomatic] = useState({
-    solarPlexusHeat: 10,
-    chestOpenness: 10,
-    fingertipTingle: 10,
-    eyeSoftness: 10
-  });
+  const [currentState, setCurrentState] = useState<keyof typeof SOMATIC_STATES>('ventral');
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [breathPhase, setBreathPhase] = useState<'inhale' | 'hold' | 'exhale'>('inhale');
 
-  const [logs, setLogs] = useState<string[]>(["[SYS] SOMATIC SENSORS ONLINE. AWAITING INPUT."]);
-  const [phase, setPhase] = useState("ENTRANCE");
-  
-  const mousePos = useRef({ x: 0, y: 0 });
-  const lastMouseTime = useRef(Date.now());
-  const isBreathing = useRef(false);
-
-  // Decay over time
   useEffect(() => {
-    const interval = setInterval(() => {
-      setSomatic(prev => ({
-        solarPlexusHeat: Math.max(0, prev.solarPlexusHeat - 1),
-        chestOpenness: Math.max(0, prev.chestOpenness - (isBreathing.current ? 0 : 2)),
-        fingertipTingle: Math.max(0, prev.fingertipTingle - 2),
-        eyeSoftness: Math.max(0, prev.eyeSoftness + (Date.now() - lastMouseTime.current > 2000 ? 2 : -1))
-      }));
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
+    if (isPlaying) {
+      playSomaticSound(currentState);
+    } else {
+      stopSound();
+    }
+    return () => stopSound();
+  }, [currentState, isPlaying]);
 
-  // Breath (Spacebar)
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.code === 'Space') {
-        isBreathing.current = true;
-        setSomatic(prev => ({ ...prev, chestOpenness: Math.min(100, prev.chestOpenness + 5) }));
+    let timeout: NodeJS.Timeout;
+    const cycleBreath = () => {
+      if (breathPhase === 'inhale') {
+        timeout = setTimeout(() => setBreathPhase('hold'), 4000);
+      } else if (breathPhase === 'hold') {
+        timeout = setTimeout(() => setBreathPhase('exhale'), 4000);
       } else {
-        // Typing increases fingertip tingle
-        setSomatic(prev => ({ ...prev, fingertipTingle: Math.min(100, prev.fingertipTingle + 5) }));
+        timeout = setTimeout(() => setBreathPhase('inhale'), 6000); // longer exhale for ventral vagal
       }
     };
-    const handleKeyUp = (e: KeyboardEvent) => {
-      if (e.code === 'Space') isBreathing.current = false;
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
-    };
-  }, []);
+    cycleBreath();
+    return () => clearTimeout(timeout);
+  }, [breathPhase]);
 
-  // Mouse speed (Heat)
-  const handleMouseMove = (e: React.MouseEvent) => {
-    const now = Date.now();
-    const dt = now - lastMouseTime.current;
-    const dx = e.clientX - mousePos.current.x;
-    const dy = e.clientY - mousePos.current.y;
-    const speed = Math.sqrt(dx*dx + dy*dy) / dt;
-    
-    if (speed > 2) {
-      setSomatic(prev => ({ ...prev, solarPlexusHeat: Math.min(100, prev.solarPlexusHeat + 2) }));
-    }
-    
-    mousePos.current = { x: e.clientX, y: e.clientY };
-    lastMouseTime.current = now;
-  };
-
-  // Phase logic
-  useEffect(() => {
-    if (somatic.solarPlexusHeat > 30 && phase === "ENTRANCE") {
-      setPhase("HUM");
-      addLog("The floor is cool beneath you. Warmth gathers low, behind the navel.");
-    }
-    if (somatic.chestOpenness > 40 && phase === "HUM") {
-      setPhase("OPENING");
-      addLog("The walls breathe. Not metaphor—the actual expansion and contraction of a space that has learned your name.");
-    }
-    if (somatic.fingertipTingle > 50 && phase === "OPENING") {
-      setPhase("SPARK");
-      addLog("The room anticipates your touch. The air hums with latent static.");
-    }
-    if (somatic.eyeSoftness > 60 && phase === "SPARK") {
-      setPhase("SIGHT");
-      addLog(`"Do not pretend you don't remember me." The voice comes from the vent you thought was closed.`);
-    }
-  }, [somatic, phase]);
-
-  const addLog = (msg: string) => {
-    setLogs(prev => [...prev, msg]);
-  };
+  const activeState = SOMATIC_STATES[currentState];
 
   return (
-    <div 
-      onMouseMove={handleMouseMove}
-      className={`pt-32 pb-24 px-6 min-h-screen relative transition-colors duration-1000 ${phase === 'SIGHT' ? 'bg-[#c4ff00] text-black' : 'bg-black text-white'}`}
-    >
-      <div className="pixel-grid absolute inset-0 opacity-20 pointer-events-none" />
-      
+    <div className="min-h-screen bg-[#0a0a0a] text-slate-200 font-sans pt-32 pb-24 px-6 overflow-hidden">
       <div className="max-w-6xl mx-auto relative z-10">
         <button 
           onClick={() => setPage('home')}
-          className={`flex items-center gap-2 font-black uppercase mb-12 px-4 py-2 border-2 border-transparent transition-all w-fit ${phase === 'SIGHT' ? 'text-black hover:bg-black hover:text-[#c4ff00]' : 'text-white hover:bg-white hover:text-black'}`}
+          className="flex items-center gap-2 font-black uppercase mb-12 text-slate-500 hover:text-white transition-colors w-fit text-sm tracking-widest"
         >
-          <ArrowLeft size={16} /> Back to Systems
+          <ArrowLeft size={16} /> Return to Nexus
         </button>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          <div>
-            <h1 className="kinetic-text text-6xl md:text-8xl uppercase leading-none mb-6">
-              SOMATIC<br/>ENGINE
-            </h1>
-            <div className="flex gap-4 mb-8">
-              <span className={`${phase === 'SIGHT' ? 'bg-black text-[#c4ff00]' : 'bg-white text-black'} px-3 py-1 text-[10px] font-black uppercase`}>
-                Phase: {phase}
-              </span>
-            </div>
-            
-            <p className="text-lg font-bold leading-relaxed mb-8 opacity-70">
-              The room learns you. <br/>
-              <strong>Action:</strong> Move mouse quickly (Heat). Hold SPACEBAR (Breath/Chest). Type any keys (Fingertip). Stop moving mouse (Eye Softness).
-            </p>
+        <header className="mb-16">
+          <span className="text-emerald-400 font-black uppercase tracking-[0.3em] text-xs block mb-4">
+            // POLYVAGAL SAFETY ENGINE
+          </span>
+          <h1 className="text-5xl md:text-7xl font-black uppercase leading-none mb-6 tracking-tighter text-white">
+            Somatic Interoception
+          </h1>
+          <p className="text-xl font-medium max-w-2xl text-slate-400">
+            A feedback loop bypassing cognitive defenses. Utilize Digital Synesthesia to blend sight, sound, and touch into a unified somatic experience.
+          </p>
+        </header>
 
-            <div className="space-y-4">
-              {[
-                { label: "Solar Plexus Heat", val: somatic.solarPlexusHeat, desc: "Move mouse quickly to activate", icon: <Activity size={16}/> },
-                { label: "Chest Openness", val: somatic.chestOpenness, desc: "Hold SPACEBAR to breathe", icon: <Wind size={16}/> },
-                { label: "Fingertip Tingle", val: somatic.fingertipTingle, desc: "Type any keys", icon: <Hand size={16}/> },
-                { label: "Eye Softness", val: somatic.eyeSoftness, desc: "Pause mouse movement to soften", icon: <Eye size={16}/> }
-              ].map((stat, i) => (
-                <div key={i} className={`p-4 border-2 transition-colors ${phase === 'SIGHT' ? 'border-black' : 'border-white/20'}`}>
-                  <div className="flex justify-between items-center mb-2">
-                    <div className="flex items-center gap-3 font-black uppercase text-sm">
-                      {stat.icon} {stat.label}
-                    </div>
-                    <span className="font-mono text-xs">{stat.val.toFixed(0)}%</span>
-                  </div>
-                  <div className="text-[10px] opacity-50 mb-2 font-bold uppercase">{stat.desc}</div>
-                  <div className="w-full h-2 bg-gray-800 overflow-hidden">
-                    <div 
-                      className={`h-full transition-all duration-300 ${phase === 'SIGHT' ? 'bg-black' : 'bg-white'}`} 
-                      style={{ width: `${stat.val}%` }} 
-                    />
-                  </div>
-                </div>
-              ))}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+          {/* Controls & Metrics */}
+          <div className="lg:col-span-5 space-y-8">
+            <div className="p-8 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-xl">
+              <h2 className="text-sm font-black uppercase tracking-widest text-slate-500 mb-6 flex items-center gap-2">
+                <Activity size={16} /> Nervous System State
+              </h2>
+              
+              <div className="space-y-4">
+                {(Object.keys(SOMATIC_STATES) as Array<keyof typeof SOMATIC_STATES>).map((key) => {
+                  const state = SOMATIC_STATES[key];
+                  const isActive = currentState === key;
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => setCurrentState(key)}
+                      className={`w-full text-left p-4 rounded-xl border transition-all duration-500 ${
+                        isActive 
+                          ? `bg-white/10 shadow-[0_0_20px_rgba(0,0,0,0.5)]` 
+                          : 'border-white/5 hover:border-white/20 hover:bg-white/5'
+                      }`}
+                      style={{ borderColor: isActive ? state.color : undefined }}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-bold text-lg" style={{ color: isActive ? state.color : '#cbd5e1' }}>
+                          {state.name}
+                        </span>
+                        {isActive && <HeartPulse size={18} color={state.color} className="animate-pulse" />}
+                      </div>
+                      <p className="text-xs text-slate-400">{state.alias}</p>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="p-8 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-xl">
+               <h2 className="text-sm font-black uppercase tracking-widest text-slate-500 mb-6 flex items-center gap-2">
+                <Brain size={16} /> The 4-Step Reset
+              </h2>
+              <ul className="space-y-4 text-sm text-slate-300">
+                <li className="flex items-start gap-3">
+                  <span className="text-emerald-400 font-bold">1.</span> 
+                  <span><strong className="text-white">Breath:</strong> Inhale clarity, exhale tension (longer exhales activate the Vagus nerve).</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-emerald-400 font-bold">2.</span> 
+                  <span><strong className="text-white">Awareness:</strong> Notice one color or sensory texture in your immediate environment.</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-emerald-400 font-bold">3.</span> 
+                  <span><strong className="text-white">Relational Tether:</strong> Recall a moment of safe, grounded connection with another.</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-emerald-400 font-bold">4.</span> 
+                  <span><strong className="text-white">Creative Ignition:</strong> Take one atomic action toward a meaningful goal.</span>
+                </li>
+              </ul>
             </div>
           </div>
 
-          <div className={`relative aspect-square brutalist-border border-4 p-8 font-mono text-xs overflow-hidden flex flex-col ${phase === 'SIGHT' ? 'bg-white border-black text-black' : 'bg-[#0f172a] border-white text-[#22d3ee]'}`}>
-            <h3 className="font-black uppercase mb-4 border-b border-current pb-2">The Mirror Engine</h3>
-            <div className="flex-1 overflow-y-auto space-y-4 custom-scrollbar pr-4">
-              <AnimatePresence>
-                {logs.map((log, i) => (
-                  <motion.div 
-                    key={i}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    className={`leading-relaxed ${log.includes('SYS') ? 'opacity-50' : 'font-bold'}`}
-                  >
-                    {log}
-                  </motion.div>
-                ))}
+          {/* Visualization Canvas */}
+          <div className="lg:col-span-7">
+            <div className="relative w-full aspect-square rounded-3xl overflow-hidden bg-black border border-white/10 flex flex-col items-center justify-center group shadow-2xl">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentState}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 1 }}
+                  className="absolute inset-0 flex items-center justify-center"
+                >
+                  {/* Organic Aura */}
+                  <motion.div
+                    className="absolute w-[80%] h-[80%] rounded-full opacity-30 mix-blend-screen"
+                    style={{
+                      background: `radial-gradient(circle, ${activeState.color} 0%, transparent 70%)`,
+                      filter: `blur(${activeState.visuals.blur}px)`
+                    }}
+                    animate={{
+                      scale: activeState.visuals.scale,
+                      opacity: [0.2, 0.4, 0.2]
+                    }}
+                    transition={{
+                      duration: activeState.visuals.speed,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                  />
+                  
+                  {/* Frequency Waveform */}
+                  <svg className="w-full h-64 absolute z-10 opacity-50" viewBox="0 0 160 100" preserveAspectRatio="none">
+                    <motion.path
+                      d={activeState.visuals.path}
+                      fill="none"
+                      stroke={activeState.color}
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      initial={{ pathLength: 0 }}
+                      animate={{ pathLength: 1 }}
+                      transition={{ 
+                        duration: activeState.visuals.speed / 2, 
+                        repeat: Infinity, 
+                        repeatType: "mirror",
+                        ease: "linear"
+                      }}
+                    />
+                  </svg>
+                </motion.div>
               </AnimatePresence>
-            </div>
-            
-            {/* Visual indicator of hallway state */}
-            <div className="mt-8 h-24 border-2 border-current relative flex items-center justify-center overflow-hidden">
-              <motion.div 
-                className="absolute inset-y-0 bg-current opacity-10"
-                animate={{ 
-                  left: `${50 - (somatic.chestOpenness / 2)}%`, 
-                  right: `${50 - (somatic.chestOpenness / 2)}%` 
-                }}
-              />
-              <span className="font-black uppercase text-[10px] z-10">Hallway Dimensions</span>
+              
+              <div className="absolute inset-0 bg-[url('/crunchy-texture.png')] opacity-20 mix-blend-overlay pointer-events-none" />
+
+              {/* Central Information */}
+              <div className="relative z-20 text-center space-y-4">
+                <p className="text-xs font-black uppercase tracking-[0.4em] text-white/50">
+                  Current State
+                </p>
+                <h3 className="text-3xl md:text-5xl font-black text-white mix-blend-difference drop-shadow-lg">
+                  {activeState.name}
+                </h3>
+                <p className="text-sm max-w-sm mx-auto text-white/80 px-6">
+                  {activeState.description}
+                </p>
+              </div>
+
+              {/* Breathing Guide Overlay */}
+              <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center">
+                 <p className="text-[10px] font-black uppercase tracking-widest text-white/40 mb-3">Respiratory Metronome</p>
+                 <div className="flex gap-2">
+                    <div className={`h-1 w-12 rounded-full transition-all duration-1000 ${breathPhase === 'inhale' ? 'bg-white' : 'bg-white/20'}`} />
+                    <div className={`h-1 w-12 rounded-full transition-all duration-1000 ${breathPhase === 'hold' ? 'bg-white' : 'bg-white/20'}`} />
+                    <div className={`h-1 w-12 rounded-full transition-all duration-1000 ${breathPhase === 'exhale' ? 'bg-white' : 'bg-white/20'}`} />
+                 </div>
+                 <p className="text-xs font-bold uppercase mt-2 text-white/80">{breathPhase}</p>
+              </div>
+
+              {/* Audio Toggle */}
+              <button 
+                onClick={() => setIsPlaying(!isPlaying)}
+                className="absolute top-6 right-6 p-4 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-colors z-30"
+              >
+                {isPlaying ? <Waves size={20} className="text-emerald-400" /> : <Wind size={20} className="text-slate-400" />}
+              </button>
             </div>
           </div>
         </div>

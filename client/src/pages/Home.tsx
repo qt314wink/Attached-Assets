@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Globe, Zap, Layers, Cpu, ShieldCheck, Code2, BrainCircuit, Users, Palette } from 'lucide-react';
+import { ArrowRight, Globe, Zap, Layers, Cpu, ShieldCheck, Code2, BrainCircuit, Users, Palette, Waves, Network, Box, PenTool } from 'lucide-react';
 import { PrismText } from '@/components/Toolkit';
 
 export default function Home({ setPage }: { setPage: (p: string) => void }) {
@@ -90,7 +90,8 @@ export default function Home({ setPage }: { setPage: (p: string) => void }) {
                { title: "Agentic Sandbox", icon: <Users size={32}/>, color: "bg-blue-200", id: "module-visionaries" },
                { title: "SVG Matrix", icon: <Palette size={32}/>, color: "bg-rose-200", id: "module-stylematrix" },
                { title: "Elementalmorphism", icon: <Box size={32}/>, color: "bg-emerald-200", id: "module-elemental" },
-               { title: "Paradox of Power", icon: <Network size={32}/>, color: "bg-amber-200", id: "module-sovereignty" }
+               { title: "Paradox of Power", icon: <Network size={32}/>, color: "bg-amber-200", id: "module-sovereignty" },
+               { title: "Graffiti Typewriter", icon: <PenTool size={32}/>, color: "bg-red-200", id: "module-graffiti" }
              ].map((item, idx) => (
                <motion.div 
                  key={idx}
