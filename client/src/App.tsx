@@ -16,6 +16,11 @@ import ToolkitPage from './pages/Toolkit';
 import SomaticModule from './pages/SomaticModule';
 import PromptwareModule from './pages/PromptwareModule';
 import BestiaryModule from './pages/BestiaryModule';
+import LabyrinthModule from './pages/LabyrinthModule';
+import BiomimesisModule from './pages/BiomimesisModule';
+import FrameworksModule from './pages/FrameworksModule';
+import VisionariesModule from './pages/VisionariesModule';
+import StyleMatrixModule from './pages/StyleMatrixModule';
 
 const GLITCH_VARIANTS = {
   initial: { skew: 0, x: 0 },
@@ -465,6 +470,11 @@ export default function App() {
             {page === 'module-somatic' && <SomaticModule setPage={setPage} />}
             {page === 'module-promptware' && <PromptwareModule setPage={setPage} />}
             {page === 'module-bestiary' && <BestiaryModule setPage={setPage} />}
+            {page === 'module-labyrinth' && <LabyrinthModule setPage={setPage} />}
+            {page === 'module-biomimesis' && <BiomimesisModule setPage={setPage} />}
+            {page === 'module-frameworks' && <FrameworksModule setPage={setPage} />}
+            {page === 'module-visionaries' && <VisionariesModule setPage={setPage} />}
+            {page === 'module-stylematrix' && <StyleMatrixModule setPage={setPage} />}
           </motion.div>
         </AnimatePresence>
       </main>

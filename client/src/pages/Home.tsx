@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Globe, Zap, Layers, Cpu, ShieldCheck } from 'lucide-react';
+import { ArrowRight, Globe, Zap, Layers, Cpu, ShieldCheck, Code2, BrainCircuit, Users, Palette } from 'lucide-react';
 import { PrismText } from '@/components/Toolkit';
 
 export default function Home({ setPage }: { setPage: (p: string) => void }) {
@@ -78,11 +78,16 @@ export default function Home({ setPage }: { setPage: (p: string) => void }) {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
              {[
                { title: "Somatic Engine", icon: <ShieldCheck size={32}/>, color: "bg-purple-200", id: "module-somatic" },
                { title: "Promptware Blueprints", icon: <Layers size={32}/>, color: "bg-[#c4ff00]", id: "module-promptware" },
-               { title: "Distortion Bestiary", icon: <Cpu size={32}/>, color: "bg-blue-200", id: "module-bestiary" }
+               { title: "Distortion Bestiary", icon: <Cpu size={32}/>, color: "bg-blue-200", id: "module-bestiary" },
+               { title: "Component Arsenal", icon: <Code2 size={32}/>, color: "bg-orange-200", id: "module-labyrinth" },
+               { title: "Biomimetic UI", icon: <Globe size={32}/>, color: "bg-pink-200", id: "module-biomimesis" },
+               { title: "Cognitive Interfaces", icon: <BrainCircuit size={32}/>, color: "bg-teal-200", id: "module-frameworks" },
+               { title: "Network Visionaries", icon: <Users size={32}/>, color: "bg-indigo-200", id: "module-visionaries" },
+               { title: "Aesthetic Matrix", icon: <Palette size={32}/>, color: "bg-rose-200", id: "module-stylematrix" }
              ].map((item, idx) => (
                <motion.div 
                  key={idx}
