@@ -23,6 +23,13 @@ import VisionariesModule from './pages/VisionariesModule';
 import StyleMatrixModule from './pages/StyleMatrixModule';
 import MythOSModule from './pages/MythOSModule';
 import MaterialArchiveModule from './pages/MaterialArchiveModule';
+import NeumorphicDepthModule from './pages/NeumorphicDepthModule';
+import LiquidPhysicsModule from './pages/LiquidPhysicsModule';
+import IndividuationOdysseyModule from './pages/IndividuationOdysseyModule';
+import ClaymorphismModule from './pages/ClaymorphismModule';
+import SemanticLexiconModule from './pages/SemanticLexiconModule';
+import ElementalmorphismModule from './pages/ElementalmorphismModule';
+import SovereigntyParadoxModule from './pages/SovereigntyParadoxModule';
 
 const GLITCH_VARIANTS = {
   initial: { skew: 0, x: 0 },
@@ -479,6 +486,13 @@ export default function App() {
             {page === 'module-stylematrix' && <StyleMatrixModule setPage={setPage} />}
             {page === 'module-mythos' && <MythOSModule setPage={setPage} />}
             {page === 'module-materials' && <MaterialArchiveModule setPage={setPage} />}
+            {page === 'module-neumorphic' && <NeumorphicDepthModule setPage={setPage} />}
+            {page === 'module-liquid' && <LiquidPhysicsModule setPage={setPage} />}
+            {page === 'module-individuation' && <IndividuationOdysseyModule setPage={setPage} />}
+            {page === 'module-claymorphism' && <ClaymorphismModule setPage={setPage} />}
+            {page === 'module-semantic' && <SemanticLexiconModule setPage={setPage} />}
+            {page === 'module-elemental' && <ElementalmorphismModule setPage={setPage} />}
+            {page === 'module-sovereignty' && <SovereigntyParadoxModule setPage={setPage} />}
           </motion.div>
         </AnimatePresence>
       </main>

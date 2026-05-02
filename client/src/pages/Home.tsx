@@ -82,13 +82,15 @@ export default function Home({ setPage }: { setPage: (p: string) => void }) {
              {[
                { title: "Somatic Engine", icon: <ShieldCheck size={32}/>, color: "bg-purple-200", id: "module-somatic" },
                { title: "Animate Materials", icon: <Layers size={32}/>, color: "bg-[#c4ff00]", id: "module-materials" },
-               { title: "Distortion Bestiary", icon: <Cpu size={32}/>, color: "bg-blue-200", id: "module-bestiary" },
+               { title: "Liquid Physics", icon: <Waves size={32}/>, color: "bg-pink-200", id: "module-liquid" },
+               { title: "Soft UI Logic", icon: <Box size={32}/>, color: "bg-slate-200", id: "module-neumorphic" },
+               { title: "Inner Odyssey", icon: <BrainCircuit size={32}/>, color: "bg-indigo-200", id: "module-individuation" },
                { title: "Component Forge", icon: <Code2 size={32}/>, color: "bg-orange-200", id: "module-labyrinth" },
-               { title: "Sentient UX", icon: <Globe size={32}/>, color: "bg-pink-200", id: "module-biomimesis" },
-               { title: "DSPy Pipelines", icon: <BrainCircuit size={32}/>, color: "bg-teal-200", id: "module-frameworks" },
-               { title: "Agentic Sandbox", icon: <Users size={32}/>, color: "bg-indigo-200", id: "module-visionaries" },
+               { title: "Sentient UX", icon: <Globe size={32}/>, color: "bg-teal-200", id: "module-biomimesis" },
+               { title: "Agentic Sandbox", icon: <Users size={32}/>, color: "bg-blue-200", id: "module-visionaries" },
                { title: "SVG Matrix", icon: <Palette size={32}/>, color: "bg-rose-200", id: "module-stylematrix" },
-               { title: "MythOS Astrocartographer", icon: <Zap size={32}/>, color: "bg-cyan-200", id: "module-mythos" }
+               { title: "Elementalmorphism", icon: <Box size={32}/>, color: "bg-emerald-200", id: "module-elemental" },
+               { title: "Paradox of Power", icon: <Network size={32}/>, color: "bg-amber-200", id: "module-sovereignty" }
              ].map((item, idx) => (
                <motion.div 
                  key={idx}

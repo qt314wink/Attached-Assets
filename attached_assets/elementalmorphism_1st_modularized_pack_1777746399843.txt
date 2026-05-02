@@ -1,0 +1,458 @@
+﻿import React, { useRef, useState, useEffect } from 'react';
+import { motion, useMotionValue, useSpring, useTransform, useMotionTemplate, useVelocity, AnimatePresence } from 'framer-motion';
+
+
+// --- 1. GLOBAL SVG FILTERS (For Technical Illusions) ---
+const EtherealFilters = () => (
+ <svg className="hidden absolute w-0 h-0">
+   <defs>
+     <filter id="ferrofluid-goo">
+       <feGaussianBlur in="SourceGraphic" stdDeviation="12" result="blur" />
+       <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 25 -10" result="goo" />
+       <feBlend in="SourceGraphic" in2="goo" />
+     </filter>
+   </defs>
+ </svg>
+);
+
+
+// --- 2. AUDIO ENGINE (Procedural Sound Design) ---
+const audioCtx = typeof window !== 'undefined' ? new (window.AudioContext || window.webkitAudioContext)() : null;
+const playSound = (type) => {
+ if (!audioCtx || audioCtx.state === 'suspended') audioCtx?.resume();
+ if (!audioCtx) return;
+
+
+ const osc = audioCtx.createOscillator();
+ const gain = audioCtx.createGain();
+ osc.connect(gain); gain.connect(audioCtx.destination);
+ const now = audioCtx.currentTime;
+
+
+ if (type === 'shatter') {
+   osc.type = 'triangle';
+   osc.frequency.setValueAtTime(3000, now);
+   osc.frequency.exponentialRampToValueAtTime(100, now + 0.3);
+   gain.gain.setValueAtTime(0.2, now);
+   gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+   osc.start(now); osc.stop(now + 0.3);
+ } else if (type === 'heavy') {
+   osc.type = 'square';
+   osc.frequency.setValueAtTime(80, now);
+   osc.frequency.exponentialRampToValueAtTime(20, now + 0.5);
+   gain.gain.setValueAtTime(0.3, now);
+   gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+   osc.start(now); osc.stop(now + 0.5);
+ } else if (type === 'ai') {
+   osc.type = 'sine';
+   osc.frequency.setValueAtTime(432, now);
+   osc.frequency.linearRampToValueAtTime(864, now + 1);
+   gain.gain.setValueAtTime(0.1, now);
+   gain.gain.linearRampToValueAtTime(0, now + 1);
+   osc.start(now); osc.stop(now + 1);
+ }
+};
+
+
+// --- 3. GEMINI API ENGINE (With Exponential Backoff) ---
+const callGeminiWithRetry = async (context, query) => {
+ const apiKey = "";
+ const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+  const systemPrompt = `You are the AI interface of the Elementalmorphism product suite.
+ Context: ${context}. The user is asking a question. Respond in 2-3 insightful, poetic, or strategic sentences.`;
+
+
+ const payload = {
+   contents: [{ parts: [{ text: query }] }],
+   systemInstruction: { parts: [{ text: systemPrompt }] }
+ };
+
+
+ const delays = [1000, 2000, 4000, 8000, 16000];
+ let lastError;
+
+
+ for (let i = 0; i < delays.length; i++) {
+   try {
+     const response = await fetch(url, {
+       method: 'POST',
+       headers: { 'Content-Type': 'application/json' },
+       body: JSON.stringify(payload)
+     });
+     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+     const data = await response.json();
+     return data.candidates?.[0]?.content?.parts?.[0]?.text || "The oracle is silent.";
+   } catch (error) {
+     lastError = error;
+     if (i < delays.length - 1) await new Promise(res => setTimeout(res, delays[i]));
+   }
+ }
+ throw lastError;
+};
+
+
+// --- 4. CUSTOM DATA VISUALIZATION (Framer Motion Chart) ---
+const InteractiveGrowthChart = () => {
+ const dataGrounded = [5, 12, 25, 45, 75, 119];
+ const dataOptimistic = [15, 45, 120, 250, 400, 597];
+ const maxVal = 600;
+  return (
+   <div className="w-full h-80 bg-white/5 border border-white/10 rounded-3xl p-8 relative overflow-hidden backdrop-blur-xl shadow-2xl">
+     <h3 className="text-xl font-bold text-white mb-2 tracking-tight">1-Year ARR Forecast ($K)</h3>
+     <p className="text-white/50 text-sm mb-6">Triangulated Market Predictions</p>
+    
+     <div className="absolute inset-0 top-24 bottom-10 left-10 right-10 flex items-end gap-4">
+       {dataOptimistic.map((val, i) => (
+         <div key={i} className="flex-1 flex flex-col justify-end items-center h-full relative group">
+           {/* Optimistic Bar */}
+           <motion.div
+             initial={{ height: 0 }}
+             animate={{ height: `${(val / maxVal) * 100}%` }}
+             transition={{ duration: 1.5, delay: i * 0.1, type: "spring" }}
+             className="w-full bg-gradient-to-t from-cyan-500/20 to-cyan-400/80 rounded-t-lg relative flex justify-center cursor-pointer hover:brightness-125 transition-all"
+           >
+             <div className="opacity-0 group-hover:opacity-100 absolute -top-10 bg-black/80 px-3 py-1 rounded text-xs text-cyan-300 font-mono whitespace-nowrap transition-opacity border border-white/10 pointer-events-none z-20">
+               Opt: ${val}k
+             </div>
+           </motion.div>
+          
+           {/* Grounded Bar (Overlay) */}
+           <motion.div
+             initial={{ height: 0 }}
+             animate={{ height: `${(dataGrounded[i] / maxVal) * 100}%` }}
+             transition={{ duration: 1.5, delay: 0.5 + i * 0.1, type: "spring" }}
+             className="absolute bottom-0 w-3/4 bg-gradient-to-t from-purple-600/40 to-purple-500/90 rounded-t-md pointer-events-none"
+           >
+             <div className="opacity-0 group-hover:opacity-100 absolute -top-8 left-1/2 -translate-x-1/2 bg-black/80 px-2 py-1 rounded text-xs text-purple-300 font-mono whitespace-nowrap transition-opacity border border-white/10">
+               Gnd: ${dataGrounded[i]}k
+             </div>
+           </motion.div>
+          
+           <span className="text-white/40 text-xs mt-4">M{i*2 + 2}</span>
+         </div>
+       ))}
+     </div>
+    
+     {/* Grid Lines */}
+     <div className="absolute inset-0 top-24 bottom-14 left-10 right-10 pointer-events-none flex flex-col justify-between">
+       {[...Array(4)].map((_, i) => (
+         <div key={i} className="w-full border-b border-white/5 h-0" />
+       ))}
+     </div>
+   </div>
+ );
+};
+
+
+// --- 5. THE ADVANCED ELEMENTAL CARD ---
+const EsotericCard = ({ element, title, icon, description, colors, physics, onCommune }) => {
+ const cardRef = useRef(null);
+ const [isHovered, setIsHovered] = useState(false);
+ const [isShattered, setIsShattered] = useState(false);
+
+
+ const mouseX = useMotionValue(0);
+ const mouseY = useMotionValue(0);
+ const springX = useSpring(mouseX, physics);
+ const springY = useSpring(mouseY, physics);
+  const isSingularity = element === 'singularity';
+  // Inverse rotation for Singularity (Pulls towards mouse)
+ const rotateX = useTransform(springY, y => {
+   if (!cardRef.current) return 0;
+   const h = cardRef.current.offsetHeight;
+   return ((y - h / 2) / (h / 2)) * (isSingularity ? 15 : -15);
+ });
+ const rotateY = useTransform(springX, x => {
+   if (!cardRef.current) return 0;
+   const w = cardRef.current.offsetWidth;
+   return ((x - w / 2) / (w / 2)) * (isSingularity ? -15 : 15);
+ });
+
+
+ const [fluidDrops, setFluidDrops] = useState([]);
+
+
+ const handleMouseMove = (e) => {
+   if (!cardRef.current) return;
+   const rect = cardRef.current.getBoundingClientRect();
+   const x = e.clientX - rect.left; const y = e.clientY - rect.top;
+   mouseX.set(x); mouseY.set(y);
+
+
+   if (element === 'relic-flux' && isHovered && Math.random() > 0.8) {
+     setFluidDrops(prev => [...prev.slice(-3), { id: Date.now(), x, y, size: Math.random() * 40 + 20 }]);
+   }
+ };
+
+
+ const handleClick = () => {
+   if (element === 'prismatic-cinder') {
+     playSound('shatter');
+     setIsShattered(true);
+     setTimeout(() => setIsShattered(false), 2000);
+   } else {
+     playSound('heavy');
+   }
+ };
+
+
+ // Illusions
+ const singularityShadow = useMotionTemplate`radial-gradient(400px circle at ${springX}px ${springY}px, black 0%, transparent 80%)`;
+ const prismaticGlow = useMotionTemplate`radial-gradient(600px circle at ${springX}px ${springY}px, ${colors[0]}80, transparent 50%)`;
+
+
+ if (isShattered) {
+   return (
+     <div className="relative w-full h-[400px]">
+       {[...Array(6)].map((_, i) => (
+         <motion.div
+           key={i}
+           initial={{ x: 0, y: 0, rotate: 0, opacity: 1, scale: 1 }}
+           animate={{ x: (Math.random() - 0.5) * 500, y: (Math.random() - 0.5) * 500, rotate: (Math.random() - 0.5) * 360, opacity: 0, scale: 0.2 }}
+           transition={{ duration: 1.5, type: "spring", damping: 12 }}
+           className="absolute inset-0 bg-[#ff4b1f] border border-white/40"
+           style={{
+             clipPath: `polygon(${Math.random()*100}% ${Math.random()*100}%, ${Math.random()*100}% ${Math.random()*100}%, ${Math.random()*100}% ${Math.random()*100}%)`,
+             boxShadow: '0 0 50px #ff4b1f'
+           }}
+         />
+       ))}
+     </div>
+   );
+ }
+
+
+ return (
+   <motion.div
+     ref={cardRef} onMouseMove={handleMouseMove} onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)} onClick={handleClick}
+     whileTap={{ scale: isSingularity ? 0.95 : 1.02 }}
+     style={{
+       rotateX, rotateY, transformPerspective: 1200,
+       borderColor: isHovered ? colors[0] : 'rgba(255,255,255,0.05)',
+       boxShadow: isHovered ? `0 20px 50px -10px ${colors[0]}40, inset 0 0 20px ${colors[0]}20` : '0 10px 30px -10px rgba(0,0,0,0.5)',
+     }}
+     className="relative p-8 h-[400px] w-full flex flex-col justify-end overflow-hidden cursor-pointer bg-white/5 border rounded-3xl transition-all duration-700"
+   >
+     <div className="absolute inset-0 backdrop-blur-xl z-0 pointer-events-none" />
+
+
+     {/* --- LAYER 1: ILLUSIONS --- */}
+     {element === 'prismatic-cinder' && (
+       <motion.div style={{ background: prismaticGlow, opacity: isHovered ? 1 : 0 }} className="absolute inset-0 pointer-events-none transition-opacity duration-300 z-10 mix-blend-color-dodge filter brightness-150" />
+     )}
+
+
+     {element === 'relic-flux' && (
+       <div className="absolute inset-0 z-10 pointer-events-none" style={{ filter: "url('#ferrofluid-goo')" }}>
+         <motion.div style={{ left: springX, top: springY, x: '-50%', y: '-50%' }} className="absolute w-32 h-32 rounded-full bg-[#d4af37] opacity-80" />
+         {fluidDrops.map(drop => (
+           <motion.div key={drop.id} initial={{ opacity: 1, scale: 1 }} animate={{ opacity: 0, scale: 0, x: (Math.random()-0.5)*100, y: (Math.random()-0.5)*100 }} transition={{ duration: 1 }} className="absolute rounded-full bg-[#d4af37]" style={{ left: drop.x, top: drop.y, width: drop.size, height: drop.size, x: '-50%', y: '-50%' }} />
+         ))}
+       </div>
+     )}
+
+
+     {element === 'singularity' && (
+       <motion.div style={{ background: singularityShadow }} className="absolute inset-0 pointer-events-none z-10 mix-blend-multiply opacity-100" />
+     )}
+
+
+     {/* --- LAYER 2: CONTENT --- */}
+     <motion.div
+       style={{ zIndex: 20 }} className="relative pointer-events-none flex flex-col h-full"
+       animate={{ translateZ: isHovered ? 60 : 0 }} transition={{ type: "spring", stiffness: 100, damping: 20 }}
+     >
+       <div className="flex items-center gap-4 mb-3">
+         <span className="text-4xl filter drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]">{icon}</span>
+         <h2 className="text-2xl font-bold text-transparent bg-clip-text" style={{ backgroundImage: `linear-gradient(135deg, #fff, ${colors[0]})` }}>{title}</h2>
+       </div>
+       <p className="text-white/70 font-light leading-relaxed text-sm mb-4 flex-grow">{description}</p>
+      
+       <div className="flex gap-2 mt-auto">
+         <button
+           onClick={(e) => { e.stopPropagation(); playSound('ai'); onCommune(element, title, colors[0]); }}
+           className="pointer-events-auto px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 text-xs text-white backdrop-blur-md transition-colors flex items-center gap-2"
+         >
+           Commune via API ✨
+         </button>
+       </div>
+     </motion.div>
+   </motion.div>
+ );
+};
+
+
+// --- 6. API ORACLE MODAL ---
+const OracleModal = ({ element, title, color, onClose }) => {
+ const [query, setQuery] = useState("");
+ const [response, setResponse] = useState("");
+ const [loading, setLoading] = useState(false);
+
+
+ const handleSubmit = async (e) => {
+   e.preventDefault();
+   if (!query.trim()) return;
+   setLoading(true); setResponse("");
+   try {
+     const res = await callGeminiWithRetry(`You are the spirit of ${title} (${element} physics).`, query);
+     setResponse(res);
+   } catch (err) {
+     setResponse("The API connection to the elemental plane was lost.");
+   } finally {
+     setLoading(false);
+   }
+ };
+
+
+ return (
+   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl" onClick={onClose}>
+     <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }} onClick={e => e.stopPropagation()} style={{ borderColor: color, boxShadow: `0 0 80px -20px ${color}` }} className="relative w-full max-w-xl p-8 rounded-3xl bg-[#050508] border backdrop-blur-2xl">
+       <h3 className="text-xl font-bold text-white mb-6">Oracle of {title}</h3>
+       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+         <input type="text" value={query} onChange={(e) => setQuery(e.target.value)} placeholder={`Ask the ${title}...`} className="w-full px-4 py-3 text-white bg-white/5 border border-white/10 rounded-xl focus:outline-none focus:border-white/30" autoFocus />
+         <button type="submit" disabled={loading} style={{ backgroundColor: `${color}40`, borderColor: color }} className="self-end px-6 py-2 text-sm text-white border rounded-full disabled:opacity-50">{loading ? "Channeling API..." : "Seek Guidance ✨"}</button>
+       </form>
+       <AnimatePresence>
+         {response && (
+            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="mt-6 pt-6 border-t border-white/10">
+              <p className="text-sm italic font-medium text-white/90 leading-relaxed">"{response}"</p>
+            </motion.div>
+         )}
+       </AnimatePresence>
+       <button onClick={onClose} className="absolute top-6 right-6 text-white/50 hover:text-white">✕</button>
+     </motion.div>
+   </motion.div>
+ );
+};
+
+
+// --- MAIN DASHBOARD APP ---
+export default function App() {
+ const [globalMouse, setGlobalMouse] = useState({ x: 0, y: 0 });
+ const [activeOracle, setActiveOracle] = useState(null);
+
+
+ useEffect(() => {
+   const handleGlobalMove = (e) => setGlobalMouse({ x: e.clientX, y: e.clientY });
+   window.addEventListener('mousemove', handleGlobalMove);
+   return () => window.removeEventListener('mousemove', handleGlobalMove);
+ }, []);
+
+
+ const esotericCards = [
+   {
+     element: 'prismatic-cinder', icon: '🎇', title: 'Prismatic Cinder',
+     description: 'Tier 3 Solo Pack. Volatile heat crystallization. CLICK to trigger the physical polygon shatter state.',
+     colors: ['#ff4b1f', '#ff9068'], physics: { damping: 10, stiffness: 400, mass: 0.5 }
+   },
+   {
+     element: 'relic-flux', icon: '🕰️', title: 'Relic-Flux',
+     description: 'Tier 3 Solo Pack. Sentient ferrofluid. HOVER to interact with the SVG goo filter binding time shards.',
+     colors: ['#d4af37', '#8a795d'], physics: { damping: 40, stiffness: 40, mass: 3 }
+   },
+   {
+     element: 'singularity', icon: '🌑', title: 'Singularity Echo',
+     description: 'Tier 3 Solo Pack. Light absorption physics. Inverse gravity maps hover to pull the element TOWARDS you.',
+     colors: ['#2a00ff', '#000000'], physics: { damping: 20, stiffness: 200, mass: 5 }
+   }
+ ];
+
+
+ return (
+   <div className="min-h-screen bg-[#050508] text-white font-sans overflow-x-hidden relative selection:bg-cyan-500/30">
+     <EtherealFilters />
+
+
+     {/* Ambient Void Background */}
+     <motion.div
+       animate={{ x: globalMouse.x - 500, y: globalMouse.y - 500 }}
+       transition={{ type: "spring", damping: 50, stiffness: 20, mass: 5 }}
+       className="fixed w-[1000px] h-[1000px] rounded-full pointer-events-none opacity-[0.03] blur-[120px] bg-white z-0"
+     />
+
+
+     <main className="relative z-10 max-w-7xl mx-auto px-6 py-20 lg:px-12">
+      
+       {/* HEADER */}
+       <header className="mb-20">
+         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="inline-block px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-bold tracking-widest uppercase mb-6">
+           Strategy & Prototype Dashboard
+         </motion.div>
+         <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.1 }} className="text-5xl md:text-7xl font-bold tracking-tighter mb-6 bg-clip-text text-transparent bg-gradient-to-br from-white via-white to-white/30">
+           Elementalmorphism UI
+         </motion.h1>
+         <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }} className="text-lg text-white/50 max-w-2xl leading-relaxed">
+           Bridging the gap between UI and video games. A scalable, modular digital product ecosystem delivering 60fps GPU-accelerated tactile physics.
+         </motion.p>
+       </header>
+
+
+       {/* SECTION 1: BUSINESS VALUATION (Interactive Charts) */}
+       <section className="mb-32">
+         <div className="flex flex-col md:flex-row justify-between items-end mb-8 gap-4">
+           <div>
+             <h2 className="text-3xl font-bold mb-2">Market Valuation</h2>
+             <p className="text-white/50">Cross-examined with 2025-2026 Developer Tooling trends.</p>
+           </div>
+         </div>
+
+
+         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+           <div className="lg:col-span-2">
+              <InteractiveGrowthChart />
+           </div>
+          
+           <div className="flex flex-col gap-4">
+             <div className="bg-white/5 border border-white/10 rounded-3xl p-6 backdrop-blur-md">
+               <div className="text-sm text-purple-400 font-bold tracking-widest uppercase mb-2">Grounded Prediction</div>
+               <div className="text-4xl font-bold tracking-tighter mb-1">$119k <span className="text-lg text-white/30 font-normal">ARR</span></div>
+               <p className="text-white/50 text-sm">Selling 50 units/mo of the Full Bundle ($199).</p>
+             </div>
+            
+             <div className="bg-gradient-to-br from-cyan-900/40 to-black border border-cyan-500/30 rounded-3xl p-6 backdrop-blur-md shadow-[0_0_30px_-10px_rgba(6,182,212,0.3)]">
+               <div className="text-sm text-cyan-400 font-bold tracking-widest uppercase mb-2">Optimistic Prediction</div>
+               <div className="text-4xl font-bold tracking-tighter mb-1">$597k <span className="text-lg text-white/30 font-normal">ARR</span></div>
+               <p className="text-white/50 text-sm">Selling 250 units/mo driven by viral visual marketing.</p>
+             </div>
+           </div>
+         </div>
+       </section>
+
+
+       {/* SECTION 2: THE ESOTERIC SOLO PACKS (UI Implementations) */}
+       <section>
+         <div className="mb-12">
+           <h2 className="text-3xl font-bold mb-2">Tier 3: The Esoteric Solo Packs</h2>
+           <p className="text-white/50 max-w-2xl">
+             Showcasing the technical implementations: SVG Ferrofluid illusions, inverted mix-blend-mode gravity, and polygon shatter mechanics. Hover and click to interact.
+           </p>
+         </div>
+
+
+         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 [perspective:1400px]">
+           {esotericCards.map(card => (
+             <EsotericCard
+               key={card.element}
+               {...card}
+               onCommune={(el, title, color) => setActiveOracle({ element: el, title, color })}
+             />
+           ))}
+         </div>
+       </section>
+
+
+     </main>
+
+
+     {/* MODAL MOUNT */}
+     <AnimatePresence>
+       {activeOracle && (
+         <OracleModal
+           {...activeOracle}
+           onClose={() => setActiveOracle(null)}
+         />
+       )}
+     </AnimatePresence>
+   </div>
+ );
+}
