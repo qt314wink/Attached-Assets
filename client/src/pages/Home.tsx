@@ -80,9 +80,9 @@ export default function Home({ setPage }: { setPage: (p: string) => void }) {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
              {[
-               { title: "Governance Engine", icon: <ShieldCheck size={32}/>, color: "bg-purple-200" },
-               { title: "Prompt Matrix", icon: <Layers size={32}/>, color: "bg-[#c4ff00]" },
-               { title: "Neural Link", icon: <Cpu size={32}/>, color: "bg-blue-200" }
+               { title: "Somatic Engine", icon: <ShieldCheck size={32}/>, color: "bg-purple-200", id: "module-somatic" },
+               { title: "Promptware Blueprints", icon: <Layers size={32}/>, color: "bg-[#c4ff00]", id: "module-promptware" },
+               { title: "Distortion Bestiary", icon: <Cpu size={32}/>, color: "bg-blue-200", id: "module-bestiary" }
              ].map((item, idx) => (
                <motion.div 
                  key={idx}
@@ -99,7 +99,7 @@ export default function Home({ setPage }: { setPage: (p: string) => void }) {
                  </div>
                  
                  <button 
-                   onClick={() => setPage('module')}
+                   onClick={() => setPage(item.id)}
                    className="flex items-center gap-2 font-bold text-sm uppercase group-hover:gap-4 transition-all"
                  >
                    Access Module <ArrowRight className="w-4 h-4" />

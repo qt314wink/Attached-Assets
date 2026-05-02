@@ -13,7 +13,9 @@ import { Nav, Footer } from '@/components/Layout';
 import Home from './pages/Home';
 import EventsPage from './pages/Events';
 import ToolkitPage from './pages/Toolkit';
-import ModulePage from './pages/Module';
+import SomaticModule from './pages/SomaticModule';
+import PromptwareModule from './pages/PromptwareModule';
+import BestiaryModule from './pages/BestiaryModule';
 
 const GLITCH_VARIANTS = {
   initial: { skew: 0, x: 0 },
@@ -460,7 +462,9 @@ export default function App() {
             {page === 'forge' && <ForgePage />}
             {page === 'toolkit' && <ToolkitPage setPage={setPage} />}
             {page === 'events' && <EventsPage setPage={setPage} />}
-            {page === 'module' && <ModulePage setPage={setPage} />}
+            {page === 'module-somatic' && <SomaticModule setPage={setPage} />}
+            {page === 'module-promptware' && <PromptwareModule setPage={setPage} />}
+            {page === 'module-bestiary' && <BestiaryModule setPage={setPage} />}
           </motion.div>
         </AnimatePresence>
       </main>
