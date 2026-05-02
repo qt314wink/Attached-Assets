@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { ArrowLeft, Maximize } from 'lucide-react';
+import imgVisuoHaptic from '@assets/Slide_1777310577560_1777745432509.png';
 
 export default function StyleMatrixModule({ setPage }: { setPage: (p: string) => void }) {
   const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
@@ -62,12 +63,15 @@ export default function StyleMatrixModule({ setPage }: { setPage: (p: string) =>
         <div 
           ref={containerRef}
           onMouseMove={handleMouseMove}
-          className="relative w-full h-[600px] brutalist-border border-white overflow-hidden cursor-crosshair group"
+          className="relative w-full h-[600px] brutalist-border border-white overflow-hidden cursor-crosshair group bg-black"
         >
           {/* Target Graphic with the filter applied */}
           <div 
-            className="absolute inset-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&q=80&w=2000')] bg-cover bg-center transition-all duration-75"
-            style={{ filter: 'url(#lens-distortion)' }}
+            className="absolute inset-0 w-full h-full bg-cover bg-center transition-all duration-75"
+            style={{ 
+              backgroundImage: `url(${imgVisuoHaptic})`,
+              filter: 'url(#lens-distortion)' 
+            }}
           />
           
           <div className="absolute inset-0 bg-black/20 pointer-events-none" />

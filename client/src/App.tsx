@@ -22,6 +22,7 @@ import FrameworksModule from './pages/FrameworksModule';
 import VisionariesModule from './pages/VisionariesModule';
 import StyleMatrixModule from './pages/StyleMatrixModule';
 import MythOSModule from './pages/MythOSModule';
+import MaterialArchiveModule from './pages/MaterialArchiveModule';
 
 const GLITCH_VARIANTS = {
   initial: { skew: 0, x: 0 },
@@ -477,6 +478,7 @@ export default function App() {
             {page === 'module-visionaries' && <VisionariesModule setPage={setPage} />}
             {page === 'module-stylematrix' && <StyleMatrixModule setPage={setPage} />}
             {page === 'module-mythos' && <MythOSModule setPage={setPage} />}
+            {page === 'module-materials' && <MaterialArchiveModule setPage={setPage} />}
           </motion.div>
         </AnimatePresence>
       </main>

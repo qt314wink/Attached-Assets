@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Box, Sliders, Type } from 'lucide-react';
+import imgLoomFramework from '@assets/Slide_1777310574403_1777745432513.png';
 
 export default function LabyrinthModule({ setPage }: { setPage: (p: string) => void }) {
   const [blur, setBlur] = useState(18);
@@ -9,9 +10,12 @@ export default function LabyrinthModule({ setPage }: { setPage: (p: string) => v
   const [kineticWeight, setKineticWeight] = useState(400);
 
   return (
-    <div className="pt-32 pb-24 px-6 bg-[url('https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&q=80&w=2000')] bg-cover bg-center min-h-screen relative text-black">
+    <div 
+      className="pt-32 pb-24 px-6 bg-cover bg-center min-h-screen relative text-black"
+      style={{ backgroundImage: `url(${imgLoomFramework})` }}
+    >
       {/* Background overlay */}
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm pointer-events-none" />
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm pointer-events-none" />
 
       <div className="max-w-6xl mx-auto relative z-10 flex flex-col h-full">
         <button 

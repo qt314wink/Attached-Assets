@@ -81,7 +81,7 @@ export default function Home({ setPage }: { setPage: (p: string) => void }) {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
              {[
                { title: "Somatic Engine", icon: <ShieldCheck size={32}/>, color: "bg-purple-200", id: "module-somatic" },
-               { title: "Promptware Blueprints", icon: <Layers size={32}/>, color: "bg-[#c4ff00]", id: "module-promptware" },
+               { title: "Animate Materials", icon: <Layers size={32}/>, color: "bg-[#c4ff00]", id: "module-materials" },
                { title: "Distortion Bestiary", icon: <Cpu size={32}/>, color: "bg-blue-200", id: "module-bestiary" },
                { title: "Component Forge", icon: <Code2 size={32}/>, color: "bg-orange-200", id: "module-labyrinth" },
                { title: "Sentient UX", icon: <Globe size={32}/>, color: "bg-pink-200", id: "module-biomimesis" },
