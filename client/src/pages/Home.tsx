@@ -78,16 +78,17 @@ export default function Home({ setPage }: { setPage: (p: string) => void }) {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
              {[
                { title: "Somatic Engine", icon: <ShieldCheck size={32}/>, color: "bg-purple-200", id: "module-somatic" },
                { title: "Promptware Blueprints", icon: <Layers size={32}/>, color: "bg-[#c4ff00]", id: "module-promptware" },
                { title: "Distortion Bestiary", icon: <Cpu size={32}/>, color: "bg-blue-200", id: "module-bestiary" },
-               { title: "Component Arsenal", icon: <Code2 size={32}/>, color: "bg-orange-200", id: "module-labyrinth" },
-               { title: "Biomimetic UI", icon: <Globe size={32}/>, color: "bg-pink-200", id: "module-biomimesis" },
-               { title: "Cognitive Interfaces", icon: <BrainCircuit size={32}/>, color: "bg-teal-200", id: "module-frameworks" },
-               { title: "Network Visionaries", icon: <Users size={32}/>, color: "bg-indigo-200", id: "module-visionaries" },
-               { title: "Aesthetic Matrix", icon: <Palette size={32}/>, color: "bg-rose-200", id: "module-stylematrix" }
+               { title: "Component Forge", icon: <Code2 size={32}/>, color: "bg-orange-200", id: "module-labyrinth" },
+               { title: "Sentient UX", icon: <Globe size={32}/>, color: "bg-pink-200", id: "module-biomimesis" },
+               { title: "DSPy Pipelines", icon: <BrainCircuit size={32}/>, color: "bg-teal-200", id: "module-frameworks" },
+               { title: "Agentic Sandbox", icon: <Users size={32}/>, color: "bg-indigo-200", id: "module-visionaries" },
+               { title: "SVG Matrix", icon: <Palette size={32}/>, color: "bg-rose-200", id: "module-stylematrix" },
+               { title: "MythOS Astrocartographer", icon: <Zap size={32}/>, color: "bg-cyan-200", id: "module-mythos" }
              ].map((item, idx) => (
                <motion.div 
                  key={idx}

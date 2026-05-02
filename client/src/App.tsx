@@ -21,6 +21,7 @@ import BiomimesisModule from './pages/BiomimesisModule';
 import FrameworksModule from './pages/FrameworksModule';
 import VisionariesModule from './pages/VisionariesModule';
 import StyleMatrixModule from './pages/StyleMatrixModule';
+import MythOSModule from './pages/MythOSModule';
 
 const GLITCH_VARIANTS = {
   initial: { skew: 0, x: 0 },
@@ -475,6 +476,7 @@ export default function App() {
             {page === 'module-frameworks' && <FrameworksModule setPage={setPage} />}
             {page === 'module-visionaries' && <VisionariesModule setPage={setPage} />}
             {page === 'module-stylematrix' && <StyleMatrixModule setPage={setPage} />}
+            {page === 'module-mythos' && <MythOSModule setPage={setPage} />}
           </motion.div>
         </AnimatePresence>
       </main>
