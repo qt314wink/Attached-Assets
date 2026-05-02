@@ -6,48 +6,52 @@ import { ArrowLeft, Volume2, PenTool, Download, SlidersHorizontal, Image as Imag
 let audioCtx: AudioContext | undefined;
 const playTypewriterSound = () => {
   if (typeof window === 'undefined') return;
-  if (!audioCtx) audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-  if (audioCtx.state === 'suspended') audioCtx.resume();
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
 
-  const osc = audioCtx.createOscillator();
-  const gain = audioCtx.createGain();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
 
-  osc.connect(gain);
-  gain.connect(audioCtx.destination);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
 
-  const now = audioCtx.currentTime;
-  osc.type = 'square';
-  osc.frequency.setValueAtTime(150, now);
-  osc.frequency.exponentialRampToValueAtTime(40, now + 0.05);
-  
-  gain.gain.setValueAtTime(0.3, now);
-  gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+    const now = audioCtx.currentTime;
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(150, now);
+    osc.frequency.exponentialRampToValueAtTime(40, now + 0.05);
+    
+    gain.gain.setValueAtTime(0.3, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
 
-  osc.start(now);
-  osc.stop(now + 0.05);
+    osc.start(now);
+    osc.stop(now + 0.05);
+  } catch(e) {}
 };
 
 const playBellSound = () => {
   if (typeof window === 'undefined') return;
-  if (!audioCtx) audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-  if (audioCtx.state === 'suspended') audioCtx.resume();
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
 
-  const osc = audioCtx.createOscillator();
-  const gain = audioCtx.createGain();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
 
-  osc.connect(gain);
-  gain.connect(audioCtx.destination);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
 
-  const now = audioCtx.currentTime;
-  osc.type = 'sine';
-  osc.frequency.setValueAtTime(1200, now);
-  osc.frequency.exponentialRampToValueAtTime(400, now + 0.3);
-  
-  gain.gain.setValueAtTime(0.2, now);
-  gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+    const now = audioCtx.currentTime;
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(1200, now);
+    osc.frequency.exponentialRampToValueAtTime(400, now + 0.3);
+    
+    gain.gain.setValueAtTime(0.2, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
 
-  osc.start(now);
-  osc.stop(now + 0.3);
+    osc.start(now);
+    osc.stop(now + 0.3);
+  } catch(e) {}
 };
 
 // --- Add custom fonts to the document ---
@@ -77,6 +81,8 @@ export default function GraffitiTypewriterModule({ setPage }: { setPage: (p: str
   const [prompt, setPrompt] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
 
+  const [showOverlay, setShowOverlay] = useState(true);
+  const hasStartedTypingRef = useRef(false);
   const posRef = useRef({ x: 50, y: 100 });
   const charsDrawn = useRef(0);
 
@@ -170,6 +176,10 @@ export default function GraffitiTypewriterModule({ setPage }: { setPage: (p: str
     }
 
     playTypewriterSound();
+    if (!hasStartedTypingRef.current) {
+      hasStartedTypingRef.current = true;
+      setShowOverlay(false);
+    }
     charsDrawn.current++;
 
     const x = posRef.current.x;
@@ -347,6 +357,8 @@ export default function GraffitiTypewriterModule({ setPage }: { setPage: (p: str
       ctx?.clearRect(0, 0, canvas.width, canvas.height);
       posRef.current = { x: 50, y: 100 };
       charsDrawn.current = 0;
+      hasStartedTypingRef.current = false;
+      setShowOverlay(true);
     }
   };
 
@@ -382,14 +394,33 @@ export default function GraffitiTypewriterModule({ setPage }: { setPage: (p: str
 
   // Setup Canvas Dimensions
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (canvas) {
-      const parent = canvas.parentElement;
-      if (parent) {
-        canvas.width = parent.clientWidth;
-        canvas.height = parent.clientHeight;
+    const handleResize = () => {
+      const canvas = canvasRef.current;
+      if (canvas && canvas.parentElement) {
+        // Save current content if any
+        const ctx = canvas.getContext('2d');
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = canvas.width || 1;
+        tempCanvas.height = canvas.height || 1;
+        const tempCtx = tempCanvas.getContext('2d');
+        if (tempCtx && canvas.width > 0 && canvas.height > 0) {
+            tempCtx.drawImage(canvas, 0, 0);
+        }
+
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight;
+
+        // Restore content
+        if (tempCanvas.width > 1 && tempCanvas.height > 1) {
+            ctx?.drawImage(tempCanvas, 0, 0);
+        }
       }
-    }
+    };
+
+    // Run after a tiny delay to ensure layout is complete
+    setTimeout(handleResize, 100);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   return (
@@ -550,7 +581,7 @@ export default function GraffitiTypewriterModule({ setPage }: { setPage: (p: str
 
             {/* Instruction Overlay (fades out when typed) */}
             <AnimatePresence>
-                {charsDrawn.current === 0 && (
+                {showOverlay && (
                     <motion.div 
                         initial={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
