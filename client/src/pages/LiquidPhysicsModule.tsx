@@ -1,9 +1,9 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Check, ShoppingCart, Droplets } from 'lucide-react';
+import { ArrowLeft, Check, ShoppingCart, Droplets, ChevronDown, Send, Menu, Radio, Plus, Layers, Circle } from 'lucide-react';
 
 export default function LiquidPhysicsModule({ setPage }: { setPage: (p: string) => void }) {
-  const [droplets, setDroplets] = useState<{id: number, x: number, y: number, size: number, color: string}[]>([]);
+  const [droplets, setDroplets] = useState<{id: string, x: number, y: number, size: number, color: string}[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
   
   // States for individual components
@@ -12,6 +12,20 @@ export default function LiquidPhysicsModule({ setPage }: { setPage: (p: string) 
   const [isDragging, setIsDragging] = useState(false);
   const [toggleState, setToggleState] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
+  
+  // New States
+  const [isHoveredMelting, setIsHoveredMelting] = useState(false);
+  const [refreshY, setRefreshY] = useState(0);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [accordionOpen, setAccordionOpen] = useState(false);
+  const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [inputValue, setInputValue] = useState("");
+  const [inputFocused, setInputFocused] = useState(false);
+  const [activeRadio, setActiveRadio] = useState(1);
+  const [tooltipHovered, setTooltipHovered] = useState(false);
+  const [activePage, setActivePage] = useState(2);
+  const cursorRef = useRef<HTMLDivElement>(null);
 
   const handleButtonClick = () => {
     if (buttonState !== 'idle') return;
@@ -27,7 +41,7 @@ export default function LiquidPhysicsModule({ setPage }: { setPage: (p: string) 
     const y = e.clientY - rect.top;
 
     const newDroplets = Array.from({ length: 3 }).map((_, i) => ({
-      id: Date.now() + i,
+      id: `${Date.now()}-${Math.random()}`,
       x: x + (Math.random() - 0.5) * 60,
       y: y + (Math.random() - 0.5) * 60,
       size: Math.random() * 50 + 30,
@@ -39,6 +53,23 @@ export default function LiquidPhysicsModule({ setPage }: { setPage: (p: string) 
     setTimeout(() => {
       setDroplets(prev => prev.filter(p => !newDroplets.find(np => np.id === p.id)));
     }, 2000);
+  };
+
+  const handleRefreshDrag = (e: any, info: any) => {
+    setRefreshY(info.offset.y);
+  };
+
+  const handleRefreshDragEnd = (e: any, info: any) => {
+    if (info.offset.y > 60) {
+      setIsRefreshing(true);
+      setRefreshY(60);
+      setTimeout(() => {
+        setIsRefreshing(false);
+        setRefreshY(0);
+      }, 2000);
+    } else {
+      setRefreshY(0);
+    }
   };
 
   return (
@@ -234,7 +265,7 @@ export default function LiquidPhysicsModule({ setPage }: { setPage: (p: string) 
               <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, #000 1px, transparent 1.5px)', backgroundSize: '8px 8px' }} />
               
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <span className="font-black text-3xl uppercase tracking-widest text-black transform -rotate-12 bg-white px-4 py-2 border-[4px] border-black">Click & Drag</span>
+                <span className="font-black text-3xl uppercase tracking-widest text-black transform -rotate-12 bg-white px-4 py-2 border-[4px] border-black shadow-[4px_4px_0_#000]">Click & Drag</span>
               </div>
 
               {droplets.map(drop => (
@@ -438,35 +469,70 @@ export default function LiquidPhysicsModule({ setPage }: { setPage: (p: string) 
             </div>
           </div>
 
-          {/* Item 8: Melting Card */}
+          {/* Item 8: Melting Card (Fixed!) */}
           <div className="border-[8px] border-black bg-white shadow-[12px_12px_0_#000] flex flex-col relative overflow-hidden group">
             <div className="absolute top-4 right-4 bg-[#FF0055] text-white font-black uppercase px-4 py-2 border-[4px] border-black shadow-[4px_4px_0_#000] transform -rotate-2 z-20">
               $19.99
             </div>
             
-            <div className="bg-[#FFFF00] flex-1 flex flex-col items-center justify-center border-b-[8px] border-black relative overflow-hidden" style={{ filter: "url(#goo)" }}>
+            <div className="bg-[#FFFF00] flex-1 flex flex-col items-center justify-center border-b-[8px] border-black relative overflow-hidden pb-12" style={{ filter: "url(#goo)" }}>
                <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle, #000 1px, transparent 1.5px)', backgroundSize: '8px 8px' }} />
                
-               <div className="relative z-10 bg-black text-white border-[6px] border-black p-4 w-40 h-40 flex items-center justify-center hover:-translate-y-4 transition-transform duration-500">
-                 <span className="font-black uppercase text-xl">Hover Me</span>
+               <motion.div 
+                 className="relative z-10 w-40 h-40 flex items-center justify-center cursor-pointer"
+                 onHoverStart={() => setIsHoveredMelting(true)}
+                 onHoverEnd={() => setIsHoveredMelting(false)}
+                 animate={{ y: isHoveredMelting ? -16 : 0 }}
+                 transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+               >
+                 <motion.div 
+                   animate={{ 
+                     borderBottomLeftRadius: isHoveredMelting ? '30%' : '0%',
+                     borderBottomRightRadius: isHoveredMelting ? '10%' : '0%',
+                     scaleY: isHoveredMelting ? 1.05 : 1
+                   }} 
+                   className="absolute inset-0 bg-black text-white border-[6px] border-black z-20 flex items-center justify-center origin-top transition-all duration-300"
+                 >
+                   <span className="font-black uppercase text-xl">Hover Me</span>
+                 </motion.div>
                  
-                 {/* Drips */}
-                 <div className="absolute top-full left-4 w-6 h-12 bg-black rounded-b-full origin-top transition-all duration-500 scale-y-0 group-hover:scale-y-100 delay-100" />
-                 <div className="absolute top-full left-12 w-4 h-8 bg-black rounded-b-full origin-top transition-all duration-500 scale-y-0 group-hover:scale-y-100 delay-200" />
-                 <div className="absolute top-full right-8 w-8 h-16 bg-black rounded-b-full origin-top transition-all duration-500 scale-y-0 group-hover:scale-y-100 delay-75" />
-                 <div className="absolute top-full right-2 w-3 h-6 bg-black rounded-b-full origin-top transition-all duration-500 scale-y-0 group-hover:scale-y-100 delay-300" />
+                 {/* Drips connected to the card */}
+                 <motion.div 
+                   animate={{ scaleY: isHoveredMelting ? 3.5 : 0, opacity: isHoveredMelting ? 1 : 0 }} 
+                   className="absolute top-[90%] left-4 w-6 h-12 bg-black rounded-b-full origin-top z-10" 
+                   transition={{ duration: 0.4 }}
+                 />
+                 <motion.div 
+                   animate={{ scaleY: isHoveredMelting ? 2.5 : 0, opacity: isHoveredMelting ? 1 : 0 }} 
+                   className="absolute top-[90%] left-[60px] w-4 h-8 bg-black rounded-b-full origin-top z-10"
+                   transition={{ duration: 0.5 }}
+                 />
+                 <motion.div 
+                   animate={{ scaleY: isHoveredMelting ? 4.5 : 0, opacity: isHoveredMelting ? 1 : 0 }} 
+                   className="absolute top-[90%] right-8 w-8 h-16 bg-black rounded-b-full origin-top z-10"
+                   transition={{ duration: 0.6 }}
+                 />
                  
-                 {/* Falling droplets */}
-                 <div className="absolute top-full left-4 w-6 h-6 bg-black rounded-full opacity-0 group-hover:animate-[drip_1.5s_ease-in_infinite_0.6s]" />
-                 <div className="absolute top-full right-8 w-8 h-8 bg-black rounded-full opacity-0 group-hover:animate-[drip_2s_ease-in_infinite_0.8s]" />
-               </div>
-               <style>{`
-                 @keyframes drip {
-                   0% { transform: translateY(0) scale(1); opacity: 1; }
-                   80% { opacity: 1; }
-                   100% { transform: translateY(100px) scale(0.5); opacity: 0; }
-                 }
-               `}</style>
+                 {/* Free-falling droplets that spawn while hovered */}
+                 <AnimatePresence>
+                   {isHoveredMelting && (
+                     <>
+                       <motion.div
+                         initial={{ y: 0, scale: 0.8, opacity: 1 }}
+                         animate={{ y: 150, scale: 0, opacity: 0 }}
+                         transition={{ repeat: Infinity, duration: 1.2, delay: 0.4, ease: "easeIn" }}
+                         className="absolute top-[130%] left-4 w-6 h-6 bg-black rounded-full z-10"
+                       />
+                       <motion.div
+                         initial={{ y: 0, scale: 1, opacity: 1 }}
+                         animate={{ y: 180, scale: 0, opacity: 0 }}
+                         transition={{ repeat: Infinity, duration: 1.5, delay: 0.6, ease: "easeIn" }}
+                         className="absolute top-[150%] right-8 w-8 h-8 bg-black rounded-full z-10"
+                       />
+                     </>
+                   )}
+                 </AnimatePresence>
+               </motion.div>
             </div>
 
             <div className="p-6 flex flex-col justify-between bg-white z-10">
@@ -480,7 +546,7 @@ export default function LiquidPhysicsModule({ setPage }: { setPage: (p: string) 
             </div>
           </div>
 
-          {/* Item 9: Stringy Menu */}
+          {/* Item 9: Viscous FAB */}
           <div className="border-[8px] border-black bg-white shadow-[12px_12px_0_#000] flex flex-col relative overflow-hidden group">
             <div className="absolute top-4 right-4 bg-[#FF0055] text-white font-black uppercase px-4 py-2 border-[4px] border-black shadow-[4px_4px_0_#000] transform rotate-4 z-20">
               $21.99
@@ -508,6 +574,305 @@ export default function LiquidPhysicsModule({ setPage }: { setPage: (p: string) 
                 <p className="font-bold text-gray-600 uppercase text-sm mb-4">Floating Action Button that spawns gooey children.</p>
               </div>
               <button className="w-full bg-black text-white font-black uppercase py-4 flex items-center justify-center gap-2 hover:bg-[#FF0055] hover:text-black border-[4px] border-black transition-colors">
+                <ShoppingCart size={20} /> Add to Cart
+              </button>
+            </div>
+          </div>
+
+          {/* Item 10: Stretching Accordion */}
+          <div className="border-[8px] border-black bg-white shadow-[12px_12px_0_#000] flex flex-col relative overflow-hidden group">
+            <div className="absolute top-4 right-4 bg-[#FF0055] text-white font-black uppercase px-4 py-2 border-[4px] border-black shadow-[4px_4px_0_#000] transform -rotate-4 z-20">
+              $15.99
+            </div>
+            
+            <div className="bg-[#9900FF] flex-1 flex flex-col items-center justify-center border-b-[8px] border-black relative overflow-hidden p-8" style={{ filter: "url(#goo)" }}>
+               <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle, #000 1px, transparent 1.5px)', backgroundSize: '8px 8px' }} />
+               
+               <div className="w-full max-w-[240px] relative z-10">
+                 <button 
+                   onClick={() => setAccordionOpen(!accordionOpen)} 
+                   className="w-full bg-white border-[4px] border-black p-4 flex justify-between items-center z-20 relative font-black uppercase text-xl"
+                 >
+                   Details <ChevronDown className={`transition-transform ${accordionOpen ? 'rotate-180' : ''}`} />
+                 </button>
+                 
+                 {/* The gooey connector string */}
+                 <motion.div 
+                   animate={{ height: accordionOpen ? 80 : 0, opacity: accordionOpen ? 0 : 1 }}
+                   transition={{ duration: 0.4 }}
+                   className="w-12 bg-white border-x-[4px] border-black mx-auto absolute top-full left-0 right-0 -z-10 origin-top"
+                 />
+                 
+                 <motion.div 
+                   animate={{ y: accordionOpen ? 0 : -80, opacity: accordionOpen ? 1 : 0 }}
+                   transition={{ type: "spring", stiffness: 200, damping: 15 }}
+                   className="w-full bg-white border-[4px] border-t-0 border-black p-4 z-10 relative"
+                 >
+                   <p className="font-bold text-sm">Gooey string connects the panel briefly before snapping.</p>
+                 </motion.div>
+               </div>
+            </div>
+
+            <div className="p-6 flex flex-col justify-between bg-white z-10">
+              <div>
+                <h3 className="font-black uppercase text-2xl mb-2">Liquid Accordion</h3>
+                <p className="font-bold text-gray-600 uppercase text-sm mb-4">Expandable panel with viscous string connection.</p>
+              </div>
+              <button className="w-full bg-black text-white font-black uppercase py-4 flex items-center justify-center gap-2 hover:bg-[#00FF66] hover:text-black border-[4px] border-black transition-colors">
+                <ShoppingCart size={20} /> Add to Cart
+              </button>
+            </div>
+          </div>
+
+          {/* Item 11: Pull-to-Refresh Goop */}
+          <div className="border-[8px] border-black bg-white shadow-[12px_12px_0_#000] flex flex-col relative overflow-hidden group">
+            <div className="absolute top-4 right-4 bg-[#FF0055] text-white font-black uppercase px-4 py-2 border-[4px] border-black shadow-[4px_4px_0_#000] transform rotate-1 z-20">
+              $18.99
+            </div>
+            
+            <div className="bg-[#FF3366] flex-1 flex flex-col items-center border-b-[8px] border-black relative overflow-hidden" style={{ filter: "url(#goo)" }}>
+               <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle, #000 1px, transparent 1.5px)', backgroundSize: '8px 8px' }} />
+               
+               <div className="w-full h-12 bg-black border-b-[6px] border-black z-20 relative flex items-center justify-center text-[#FF3366] font-black uppercase">
+                 Top Bar
+               </div>
+               
+               {/* The stretched string */}
+               <motion.div 
+                 className="w-8 bg-black z-10 origin-top"
+                 style={{ height: refreshY }}
+               />
+               
+               {/* The drag handle */}
+               <motion.div
+                 drag="y"
+                 dragConstraints={{ top: 0, bottom: 60 }}
+                 dragElastic={0.1}
+                 onDrag={handleRefreshDrag}
+                 onDragEnd={handleRefreshDragEnd}
+                 animate={isRefreshing ? { y: [60, -20, 0] } : { y: 0 }}
+                 transition={{ type: "spring", bounce: 0.6 }}
+                 className="w-16 h-16 bg-black rounded-full z-20 absolute cursor-grab active:cursor-grabbing flex items-center justify-center top-8"
+                 style={{ y: refreshY }}
+               >
+                 <ArrowLeft size={24} className="text-white transform -rotate-90" />
+               </motion.div>
+               
+               <div className="mt-auto pb-8 font-black uppercase text-2xl text-black">
+                 Pull Down!
+               </div>
+            </div>
+
+            <div className="p-6 flex flex-col justify-between bg-white z-10">
+              <div>
+                <h3 className="font-black uppercase text-2xl mb-2">Pull-to-Refresh</h3>
+                <p className="font-bold text-gray-600 uppercase text-sm mb-4">Drag gesture that stretches and snaps back.</p>
+              </div>
+              <button className="w-full bg-black text-white font-black uppercase py-4 flex items-center justify-center gap-2 hover:bg-[#FFFF00] hover:text-black border-[4px] border-black transition-colors">
+                <ShoppingCart size={20} /> Add to Cart
+              </button>
+            </div>
+          </div>
+
+          {/* Item 12: Elastic Cursor Follower */}
+          <div className="border-[8px] border-black bg-white shadow-[12px_12px_0_#000] flex flex-col relative overflow-hidden group">
+            <div className="absolute top-4 right-4 bg-[#FF0055] text-white font-black uppercase px-4 py-2 border-[4px] border-black shadow-[4px_4px_0_#000] transform -rotate-5 z-20">
+              $29.99
+            </div>
+            
+            <div 
+              ref={cursorRef}
+              onMouseMove={(e) => {
+                if (!cursorRef.current) return;
+                const rect = cursorRef.current.getBoundingClientRect();
+                setCursorPos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+              }}
+              className="bg-[#00FF66] flex-1 flex flex-col items-center justify-center border-b-[8px] border-black relative overflow-hidden cursor-none" 
+              style={{ filter: "url(#goo)" }}
+            >
+               <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, #000 1px, transparent 1.5px)', backgroundSize: '8px 8px' }} />
+               
+               <span className="font-black text-3xl uppercase tracking-widest text-black transform -rotate-12 bg-white px-4 py-2 border-[4px] border-black pointer-events-none z-0">
+                 Move Mouse
+               </span>
+               
+               {/* Fixed anchor points */}
+               <div className="w-8 h-8 bg-black rounded-full absolute top-1/4 left-1/4" />
+               <div className="w-8 h-8 bg-black rounded-full absolute bottom-1/4 right-1/4" />
+               
+               {/* Follower Blob */}
+               <motion.div 
+                 animate={{ x: cursorPos.x - 32, y: cursorPos.y - 32 }}
+                 transition={{ type: "spring", mass: 50, damping: 10 }}
+                 className="w-16 h-16 bg-black rounded-full absolute top-0 left-0 pointer-events-none z-20"
+               />
+               {/* Secondary Follower (Inertia) */}
+               <motion.div 
+                 animate={{ x: cursorPos.x - 24, y: cursorPos.y - 24 }}
+                 transition={{ type: "spring", mass: 20, damping: 15 }}
+                 className="w-12 h-12 bg-black rounded-full absolute top-0 left-0 pointer-events-none z-10"
+               />
+            </div>
+
+            <div className="p-6 flex flex-col justify-between bg-white z-10">
+              <div>
+                <h3 className="font-black uppercase text-2xl mb-2">Liquid Cursor</h3>
+                <p className="font-bold text-gray-600 uppercase text-sm mb-4">Physics-driven cursor that merges with elements.</p>
+              </div>
+              <button className="w-full bg-black text-white font-black uppercase py-4 flex items-center justify-center gap-2 hover:bg-[#00E5FF] hover:text-black border-[4px] border-black transition-colors">
+                <ShoppingCart size={20} /> Add to Cart
+              </button>
+            </div>
+          </div>
+          
+          {/* Item 13: Liquid Radio Buttons */}
+          <div className="border-[8px] border-black bg-white shadow-[12px_12px_0_#000] flex flex-col relative overflow-hidden group">
+            <div className="absolute top-4 right-4 bg-[#FF0055] text-white font-black uppercase px-4 py-2 border-[4px] border-black shadow-[4px_4px_0_#000] transform rotate-5 z-20">
+              $11.99
+            </div>
+            
+            <div className="bg-[#FFFF00] flex-1 flex flex-col items-center justify-center border-b-[8px] border-black relative overflow-hidden" style={{ filter: "url(#goo)" }}>
+               <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, #000 1px, transparent 1.5px)', backgroundSize: '8px 8px' }} />
+               
+               <div className="relative flex flex-col gap-6 z-10">
+                 {/* The gooey indicator that moves between options */}
+                 <motion.div 
+                   className="absolute left-0 w-8 h-8 bg-black rounded-full pointer-events-none"
+                   animate={{ y: activeRadio * 56 }}
+                   transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                 />
+                 
+                 {[0, 1, 2].map((idx) => (
+                   <label key={idx} className="flex items-center gap-6 cursor-pointer group/radio relative">
+                     <input 
+                       type="radio" 
+                       name="liquidRadio" 
+                       checked={activeRadio === idx} 
+                       onChange={() => setActiveRadio(idx)} 
+                       className="sr-only" 
+                     />
+                     <div className="w-8 h-8 bg-white border-[4px] border-black rounded-full z-10 flex items-center justify-center">
+                       {activeRadio === idx && <div className="w-3 h-3 bg-[#00E5FF] rounded-full z-20" />}
+                     </div>
+                     <span className="font-black uppercase text-xl">Option {idx + 1}</span>
+                     
+                     {/* Trailing goop when clicked */}
+                     {activeRadio === idx && (
+                       <motion.div
+                         initial={{ x: 0, scale: 1 }}
+                         animate={{ x: 40, scale: 0, opacity: 0 }}
+                         transition={{ duration: 0.5 }}
+                         className="absolute left-4 w-6 h-6 bg-black rounded-full -z-10"
+                       />
+                     )}
+                   </label>
+                 ))}
+               </div>
+            </div>
+
+            <div className="p-6 flex flex-col justify-between bg-white z-10">
+              <div>
+                <h3 className="font-black uppercase text-2xl mb-2">Liquid Radio</h3>
+                <p className="font-bold text-gray-600 uppercase text-sm mb-4">Selection indicator slithers between choices.</p>
+              </div>
+              <button className="w-full bg-black text-white font-black uppercase py-4 flex items-center justify-center gap-2 hover:bg-[#00FF66] hover:text-black border-[4px] border-black transition-colors">
+                <ShoppingCart size={20} /> Add to Cart
+              </button>
+            </div>
+          </div>
+
+          {/* Item 14: Squishy Tooltip */}
+          <div className="border-[8px] border-black bg-white shadow-[12px_12px_0_#000] flex flex-col relative overflow-hidden group">
+            <div className="absolute top-4 right-4 bg-[#FF0055] text-white font-black uppercase px-4 py-2 border-[4px] border-black shadow-[4px_4px_0_#000] transform -rotate-3 z-20">
+              $14.99
+            </div>
+            
+            <div className="bg-[#FF3366] flex-1 flex flex-col items-center justify-center border-b-[8px] border-black relative overflow-hidden p-12" style={{ filter: "url(#goo)" }}>
+               <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, #000 1px, transparent 1.5px)', backgroundSize: '8px 8px' }} />
+               
+               <div 
+                 className="relative z-10"
+                 onMouseEnter={() => setTooltipHovered(true)}
+                 onMouseLeave={() => setTooltipHovered(false)}
+               >
+                 <motion.button 
+                   whileTap={{ scale: 0.9 }}
+                   className="bg-white text-black font-black uppercase text-2xl px-8 py-4 border-[6px] border-black rounded-[2rem]"
+                 >
+                   Hover Me
+                 </motion.button>
+                 
+                 <AnimatePresence>
+                   {tooltipHovered && (
+                     <motion.div
+                       initial={{ opacity: 0, y: 10, scale: 0.8 }}
+                       animate={{ opacity: 1, y: -20, scale: 1 }}
+                       exit={{ opacity: 0, y: 10, scale: 0.8 }}
+                       className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 bg-black text-[#00E5FF] font-black uppercase px-6 py-3 border-[4px] border-black rounded-[1.5rem] whitespace-nowrap z-20"
+                     >
+                       I'm Squishy!
+                     </motion.div>
+                   )}
+                 </AnimatePresence>
+                 
+                 {/* The gooey connection that stretches and snaps */}
+                 <motion.div
+                   animate={{ 
+                     height: tooltipHovered ? 40 : 0,
+                     opacity: tooltipHovered ? 1 : 0 
+                   }}
+                   className="absolute bottom-[80%] left-1/2 -translate-x-1/2 w-12 bg-black -z-10 origin-bottom rounded-t-full"
+                 />
+               </div>
+            </div>
+
+            <div className="p-6 flex flex-col justify-between bg-white z-10">
+              <div>
+                <h3 className="font-black uppercase text-2xl mb-2">Squishy Tooltip</h3>
+                <p className="font-bold text-gray-600 uppercase text-sm mb-4">Tooltips that emerge from elements like droplets.</p>
+              </div>
+              <button className="w-full bg-black text-white font-black uppercase py-4 flex items-center justify-center gap-2 hover:bg-[#FFFF00] hover:text-black border-[4px] border-black transition-colors">
+                <ShoppingCart size={20} /> Add to Cart
+              </button>
+            </div>
+          </div>
+
+          {/* Item 15: Gooey Pagination */}
+          <div className="border-[8px] border-black bg-white shadow-[12px_12px_0_#000] flex flex-col relative overflow-hidden group md:col-span-2 lg:col-span-1">
+            <div className="absolute top-4 right-4 bg-[#FF0055] text-white font-black uppercase px-4 py-2 border-[4px] border-black shadow-[4px_4px_0_#000] transform rotate-4 z-20">
+              $17.99
+            </div>
+            
+            <div className="bg-[#00E5FF] flex-1 flex flex-col items-center justify-center border-b-[8px] border-black relative overflow-hidden" style={{ filter: "url(#goo)" }}>
+               <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, #000 1px, transparent 1.5px)', backgroundSize: '8px 8px' }} />
+               
+               <div className="relative flex items-center gap-4 z-10 bg-white p-4 border-[6px] border-black rounded-full shadow-[8px_8px_0_#000]">
+                 
+                 {/* Active background blob */}
+                 <motion.div 
+                   className="absolute top-4 bottom-4 w-12 bg-[#FF0055] rounded-full z-0"
+                   animate={{ x: activePage * 64 }}
+                   transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                 />
+                 
+                 {[0, 1, 2, 3].map((page) => (
+                   <button
+                     key={page}
+                     onClick={() => setActivePage(page)}
+                     className={`w-12 h-12 flex items-center justify-center font-black text-xl rounded-full relative z-10 transition-colors ${activePage === page ? 'text-white' : 'text-black hover:bg-gray-200'}`}
+                   >
+                     {page + 1}
+                   </button>
+                 ))}
+               </div>
+            </div>
+
+            <div className="p-6 flex flex-col justify-between bg-white z-10">
+              <div>
+                <h3 className="font-black uppercase text-2xl mb-2">Gooey Pagination</h3>
+                <p className="font-bold text-gray-600 uppercase text-sm mb-4">Page indicator that slimes across numbers.</p>
+              </div>
+              <button className="w-full bg-black text-white font-black uppercase py-4 flex items-center justify-center gap-2 hover:bg-[#FF9900] hover:text-black border-[4px] border-black transition-colors">
                 <ShoppingCart size={20} /> Add to Cart
               </button>
             </div>
