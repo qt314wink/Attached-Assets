@@ -98,7 +98,10 @@ export default function Home({ setPage }: { setPage: (p: string) => void }) {
                    </h3>
                  </div>
                  
-                 <button className="flex items-center gap-2 font-bold text-sm uppercase group-hover:gap-4 transition-all">
+                 <button 
+                   onClick={() => setPage('module')}
+                   className="flex items-center gap-2 font-bold text-sm uppercase group-hover:gap-4 transition-all"
+                 >
                    Access Module <ArrowRight className="w-4 h-4" />
                  </button>
                </motion.div>

@@ -11,6 +11,9 @@ import {
 } from 'lucide-react';
 import { Nav, Footer } from '@/components/Layout';
 import Home from './pages/Home';
+import EventsPage from './pages/Events';
+import ToolkitPage from './pages/Toolkit';
+import ModulePage from './pages/Module';
 
 const GLITCH_VARIANTS = {
   initial: { skew: 0, x: 0 },
@@ -73,6 +76,9 @@ const COMPONENT_VARIANTS = [
 const ForgePage = () => {
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
+  const [loadingStep, setLoadingStep] = useState("");
+  const [showApiConfig, setShowApiConfig] = useState(false);
+  const [apiKeys, setApiKeys] = useState({ hf: "", figma: "" });
   const [analyzing, setAnalyzing] = useState(false);
   const [img, setImg] = useState<string | null>(null);
   const [glitch, setGlitch] = useState(false);
@@ -116,11 +122,29 @@ const ForgePage = () => {
       }
     };
 
+    const steps = [
+      "INITIALIZING NEURAL PIPELINE...",
+      "EXTRACTING 40-VAR VECTORS...",
+      "APPLYING NEURAL STYLE TRANSFER...",
+      "FINALIZING RENDER..."
+    ];
+    
+    let stepIndex = 0;
+    setLoadingStep(steps[0]);
+    
+    const interval = setInterval(() => {
+      stepIndex++;
+      if (stepIndex < steps.length) {
+        setLoadingStep(steps[stepIndex]);
+      }
+    }, 600);
+
     setTimeout(() => {
+      clearInterval(interval);
       setImg(getMockImage(selectedPreset));
       setLoading(false);
       setGlitch(false);
-    }, 2500);
+    }, 3000);
   };
 
   return (
@@ -257,10 +281,70 @@ const ForgePage = () => {
           >
             <div className="scanline" />
             <div className="absolute top-4 right-4 z-20 flex gap-2">
-               <div className="bg-black/80 backdrop-blur px-3 py-1 text-[8px] font-black text-[#c4ff00] brutalist-border !border-white/20 !shadow-none uppercase">
+              <button 
+                onClick={() => setShowApiConfig(!showApiConfig)}
+                className="bg-black/80 backdrop-blur px-3 py-1 text-[8px] font-black text-white brutalist-border !border-white/20 !shadow-none hover:text-[#c4ff00] uppercase flex items-center gap-1"
+              >
+                <Cpu size={10} /> Engine Config
+              </button>
+              <div className="bg-black/80 backdrop-blur px-3 py-1 text-[8px] font-black text-[#c4ff00] brutalist-border !border-white/20 !shadow-none uppercase">
                  Mode: {selectedPreset}
-               </div>
+              </div>
             </div>
+
+            <AnimatePresence>
+              {showApiConfig && (
+                <motion.div 
+                  initial={{ x: "100%" }}
+                  animate={{ x: 0 }}
+                  exit={{ x: "100%" }}
+                  className="absolute inset-y-0 right-0 w-80 bg-black z-30 brutalist-border border-l-4 border-white p-6 text-white flex flex-col shadow-2xl"
+                >
+                  <div className="flex justify-between items-center mb-8">
+                    <h3 className="font-black uppercase text-xl text-[#c4ff00]">Engine Setup</h3>
+                    <button onClick={() => setShowApiConfig(false)} className="hover:text-[#c4ff00]"><ArrowRight size={20}/></button>
+                  </div>
+                  
+                  <div className="space-y-6 flex-1">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold uppercase text-gray-400">Hugging Face API Key</label>
+                      <input 
+                        type="password" 
+                        value={apiKeys.hf}
+                        onChange={e => setApiKeys({...apiKeys, hf: e.target.value})}
+                        placeholder="hf_..." 
+                        className="w-full bg-gray-900 border-2 border-gray-700 p-3 text-xs font-mono focus:border-[#c4ff00] outline-none transition-colors"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold uppercase text-gray-400">Figma Weave Token</label>
+                      <input 
+                        type="password" 
+                        value={apiKeys.figma}
+                        onChange={e => setApiKeys({...apiKeys, figma: e.target.value})}
+                        placeholder="figd_..." 
+                        className="w-full bg-gray-900 border-2 border-gray-700 p-3 text-xs font-mono focus:border-[#c4ff00] outline-none transition-colors"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold uppercase text-gray-400">Active Model</label>
+                      <select className="w-full bg-gray-900 border-2 border-gray-700 p-3 text-xs font-mono focus:border-[#c4ff00] outline-none appearance-none cursor-pointer">
+                        <option>black-forest-labs/FLUX.1-dev</option>
+                        <option>stabilityai/stable-diffusion-xl</option>
+                        <option>collective-os/custom-forge-v1</option>
+                      </select>
+                    </div>
+                  </div>
+                  
+                  <button 
+                    onClick={() => setShowApiConfig(false)}
+                    className="w-full bg-[#c4ff00] text-black font-black uppercase py-3 hover:bg-white transition-colors"
+                  >
+                    Save Config
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {!img && !loading && (
               <div className="absolute inset-0 flex flex-col items-center justify-center text-white/5">
@@ -270,19 +354,13 @@ const ForgePage = () => {
             )}
             
             {loading && (
-              <div className="absolute inset-0 flex items-center justify-center bg-white">
-                 <div className="text-center relative">
-                    <div className="w-24 h-24 border-[12px] border-black border-t-[#c4ff00] animate-spin mb-6" />
-                    <p className="kinetic-text text-3xl">SYNTHESIZING</p>
-                    <div className="mt-4 flex gap-1 justify-center">
-                       {[1,2,3,4,5].map(i => (
-                         <motion.div 
-                           key={i}
-                           animate={{ height: [4, 16, 4] }}
-                           transition={{ repeat: Infinity, duration: 0.5, delay: i * 0.1 }}
-                           className="w-1 bg-black"
-                         />
-                       ))}
+              <div className="absolute inset-0 flex items-center justify-center bg-white z-10">
+                 <div className="text-center relative max-w-sm w-full px-6">
+                    <div className="w-24 h-24 border-[12px] border-black border-t-[#c4ff00] animate-spin mb-6 mx-auto" />
+                    <p className="kinetic-text text-3xl mb-4">SYNTHESIZING</p>
+                    <div className="bg-black text-[#c4ff00] p-3 text-[10px] font-mono font-bold uppercase border-2 border-black w-full overflow-hidden text-left relative">
+                      <div className="absolute top-0 left-0 bottom-0 w-1 bg-[#c4ff00] animate-pulse" />
+                      <span className="ml-2">{loadingStep}</span>
                     </div>
                  </div>
               </div>
@@ -380,18 +458,9 @@ export default function App() {
             {page === 'home' && <Home setPage={setPage} />}
             {page === 'systems' && <SystemsPage />}
             {page === 'forge' && <ForgePage />}
-            {page === 'toolkit' && (
-               <div className="pt-40 text-center min-h-screen">
-                <h1 className="kinetic-text text-8xl uppercase glitch-text">RECALIBRATING</h1>
-                <button onClick={() => setPage('home')} className="mt-8 font-black uppercase text-xs brutalist-border px-6 py-2">Return</button>
-              </div>
-            )}
-            {page === 'events' && (
-               <div className="pt-40 text-center min-h-screen">
-                <h1 className="kinetic-text text-8xl uppercase glitch-text">SYNC_PENDING</h1>
-                <button onClick={() => setPage('home')} className="mt-8 font-black uppercase text-xs brutalist-border px-6 py-2">Return</button>
-              </div>
-            )}
+            {page === 'toolkit' && <ToolkitPage setPage={setPage} />}
+            {page === 'events' && <EventsPage setPage={setPage} />}
+            {page === 'module' && <ModulePage setPage={setPage} />}
           </motion.div>
         </AnimatePresence>
       </main>
