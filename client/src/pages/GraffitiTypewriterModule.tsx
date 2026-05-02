@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Volume2, PenTool, Download, SlidersHorizontal, Image as ImageIcon, Type, Sparkles, Wand2 } from 'lucide-react';
+import { ArrowLeft, Volume2, PenTool, Download, SlidersHorizontal, Image as ImageIcon, Type, Sparkles, Wand2, Palette } from 'lucide-react';
 
 // Web Audio API for Typewriter Clack
 let audioCtx: AudioContext | undefined;
