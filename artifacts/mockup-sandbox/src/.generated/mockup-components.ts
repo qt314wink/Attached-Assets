@@ -4,5 +4,8 @@ export const modules: ModuleMap = {
   "./components/mockups/Current.tsx": () => import("../components/mockups/Current.tsx"),
   "./components/mockups/VariantA.tsx": () => import("../components/mockups/VariantA.tsx"),
   "./components/mockups/VariantB.tsx": () => import("../components/mockups/VariantB.tsx"),
-  "./components/mockups/VariantC.tsx": () => import("../components/mockups/VariantC.tsx")
+  "./components/mockups/VariantC.tsx": () => import("../components/mockups/VariantC.tsx"),
+  "./components/mockups/hero-section/VibeA.tsx": () => import("../components/mockups/hero-section/VibeA.tsx"),
+  "./components/mockups/hero-section/VibeB.tsx": () => import("../components/mockups/hero-section/VibeB.tsx"),
+  "./components/mockups/hero-section/VibeC.tsx": () => import("../components/mockups/hero-section/VibeC.tsx")
 };
