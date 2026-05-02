@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Globe, Zap, Layers, Cpu, ShieldCheck, Code2, BrainCircuit, Users, Palette, Waves, Network, Box, PenTool } from 'lucide-react';
 import { PrismText } from '@/components/Toolkit';
-import { CollageHero } from '@/components/CollageHero';
+import { SkeuomorphicHero } from '@/components/SkeuomorphicHero';
 
 export default function Home({ setPage }: { setPage: (p: string) => void }) {
   return (
-    <div className="min-h-screen pb-20 bg-[#E5E5E5]">
-      <CollageHero setPage={setPage} />
+    <div className="min-h-screen pb-20 bg-[#1a1a1a]">
+      <SkeuomorphicHero setPage={setPage} />
 
       <section className="mt-40 px-6">
         <div className="max-w-7xl mx-auto">
