@@ -5,6 +5,10 @@ export const modules: ModuleMap = {
   "./components/mockups/VariantA.tsx": () => import("../components/mockups/VariantA.tsx"),
   "./components/mockups/VariantB.tsx": () => import("../components/mockups/VariantB.tsx"),
   "./components/mockups/VariantC.tsx": () => import("../components/mockups/VariantC.tsx"),
+  "./components/mockups/hero-section/ApproachA_Terminal.tsx": () => import("../components/mockups/hero-section/ApproachA_Terminal.tsx"),
+  "./components/mockups/hero-section/ApproachB_Canvas.tsx": () => import("../components/mockups/hero-section/ApproachB_Canvas.tsx"),
+  "./components/mockups/hero-section/ApproachC_Cinematic.tsx": () => import("../components/mockups/hero-section/ApproachC_Cinematic.tsx"),
+  "./components/mockups/hero-section/ApproachD_Dashboard.tsx": () => import("../components/mockups/hero-section/ApproachD_Dashboard.tsx"),
   "./components/mockups/hero-section/BrutalistA.tsx": () => import("../components/mockups/hero-section/BrutalistA.tsx"),
   "./components/mockups/hero-section/BrutalistA_V1.tsx": () => import("../components/mockups/hero-section/BrutalistA_V1.tsx"),
   "./components/mockups/hero-section/BrutalistA_V2.tsx": () => import("../components/mockups/hero-section/BrutalistA_V2.tsx"),
@@ -45,3 +49,7 @@ export const modules: ModuleMap = {
   "./components/mockups/hero-section/VibeB.tsx": () => import("../components/mockups/hero-section/VibeB.tsx"),
   "./components/mockups/hero-section/VibeC.tsx": () => import("../components/mockups/hero-section/VibeC.tsx")
 };
+export * from "./mockups/hero-section/ApproachA_Terminal";
+export * from "./mockups/hero-section/ApproachB_Canvas";
+export * from "./mockups/hero-section/ApproachC_Cinematic";
+export * from "./mockups/hero-section/ApproachD_Dashboard";
