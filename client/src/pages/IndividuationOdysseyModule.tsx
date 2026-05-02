@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Compass, Heart, Brain, Zap, ShieldAlert } from 'lucide-react';
+import { ArrowLeft, Compass, Heart, ShieldAlert, Sparkles, Map } from 'lucide-react';
 
 export default function IndividuationOdysseyModule({ setPage }: { setPage: (p: string) => void }) {
   const [phase, setPhase] = useState<'acorn' | 'midlife' | 'shadow' | 'coherence'>('acorn');
@@ -11,60 +11,76 @@ export default function IndividuationOdysseyModule({ setPage }: { setPage: (p: s
   };
 
   return (
-    <div className="pt-32 pb-24 px-6 bg-[#050505] min-h-screen relative text-[#e2e8f0] font-serif">
-      <div className="absolute inset-0 opacity-20 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-indigo-900 via-[#050505] to-[#050505] pointer-events-none" />
+    <div className="pt-32 pb-24 px-6 bg-[#00FF66] min-h-screen relative text-black font-sans selection:bg-black selection:text-[#00FF66]">
+      {/* Halftone Background */}
+      <div className="absolute inset-0 opacity-20 mix-blend-multiply" style={{ backgroundImage: 'radial-gradient(circle, #000 2px, transparent 2.5px)', backgroundSize: '16px 16px' }} />
 
-      <div className="max-w-5xl mx-auto relative z-10">
-        <button 
-          onClick={() => setPage('home')}
-          className="flex items-center gap-2 font-sans font-black uppercase mb-12 text-indigo-400 hover:text-white transition-colors w-fit text-xs tracking-widest"
-        >
-          <ArrowLeft size={16} /> Return to Nexus
-        </button>
+      <div className="max-w-6xl mx-auto relative z-10">
+        
+        <header className="mb-12 bg-white border-[12px] border-black p-8 shadow-[20px_20px_0_#FF0055] relative transform -rotate-1">
+          <div className="absolute -top-6 -right-6 bg-[#00E5FF] p-4 border-[6px] border-black shadow-[8px_8px_0_#000] rotate-12">
+            <Map size={48} className="text-black" />
+          </div>
 
-        <header className="mb-16 text-center">
-          <h1 className="text-5xl md:text-7xl font-light italic mb-4">The Inner Odyssey</h1>
-          <p className="text-sm font-sans font-bold tracking-[0.3em] uppercase text-indigo-500">A Roadmap to Human Individuation</p>
+          <button 
+            onClick={() => setPage('home')}
+            className="flex items-center gap-2 font-black uppercase mb-6 text-white bg-black hover:bg-[#FF0055] px-4 py-2 border-[4px] border-black transition-colors w-fit text-sm shadow-[4px_4px_0_#000]"
+          >
+            <ArrowLeft size={16} /> Back
+          </button>
+          
+          <h1 className="text-5xl md:text-8xl font-black uppercase leading-none mb-4" style={{ textShadow: '4px 4px 0 #FFFF00, 8px 8px 0 #000' }}>
+            Inner<br/>Odyssey!
+          </h1>
+          <div className="bg-black text-[#00FF66] font-black uppercase px-4 py-2 border-[4px] border-white inline-block transform rotate-2 text-xl shadow-[4px_4px_0_#000]">
+            The Roadmap to Individuation
+          </div>
         </header>
 
-        <div className="flex flex-wrap justify-center gap-4 mb-16 font-sans">
+        <div className="flex flex-wrap justify-center gap-6 mb-12 relative z-20">
           {[
-            { id: 'acorn', label: '1. The Acorn Theory' },
-            { id: 'midlife', label: '2. The Midlife Pivot' },
-            { id: 'shadow', label: '3. Shadow Integration' },
-            { id: 'coherence', label: '4. Somatic Coherence' }
-          ].map(p => (
+            { id: 'acorn', label: '1. Acorn Theory', color: 'bg-[#FFFF00]' },
+            { id: 'midlife', label: '2. Midlife Pivot', color: 'bg-[#FF0055]' },
+            { id: 'shadow', label: '3. The Shadow', color: 'bg-black text-white' },
+            { id: 'coherence', label: '4. Coherence', color: 'bg-[#00E5FF]' }
+          ].map((p, i) => (
             <button
               key={p.id}
               onClick={() => setPhase(p.id as any)}
-              className={`px-6 py-3 border rounded-full text-xs font-black uppercase tracking-widest transition-all ${
-                phase === p.id ? 'bg-indigo-600 border-indigo-500 text-white' : 'border-white/10 text-gray-500 hover:border-white/30'
-              }`}
+              className={`px-8 py-4 border-[6px] border-black font-black uppercase text-xl transition-all shadow-[8px_8px_0_#000] hover:translate-x-1 hover:translate-y-1 hover:shadow-none ${
+                phase === p.id ? `${p.color} scale-110 -translate-y-2` : 'bg-white hover:bg-gray-100'
+              } ${i % 2 === 0 ? 'rotate-2' : '-rotate-2'}`}
             >
               {p.label}
             </button>
           ))}
         </div>
 
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-4xl mx-auto">
           <AnimatePresence mode="wait">
             
             {phase === 'acorn' && (
-              <motion.div key="acorn" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-8">
-                <div className="p-8 border border-white/10 bg-white/5 backdrop-blur-sm rounded-2xl text-center">
-                  <Compass size={48} className="mx-auto mb-6 text-indigo-400 opacity-50" />
-                  <h2 className="text-3xl italic mb-4">The Acorn & The Oak</h2>
-                  <p className="text-lg leading-relaxed text-gray-400 mb-8">
-                    Individuation is the slow, geological incarnation of all innate potentials embedded within the individual from birth. The lifelong effort is to align the conscious, navigating identity (The Ego) with the soul's vast, pre-defined potential (The Self).
-                  </p>
-                  <div className="grid grid-cols-2 gap-4 text-left font-sans text-sm">
-                    <div className="p-4 bg-black/50 border border-white/5 rounded-lg">
-                      <strong className="text-indigo-400 uppercase tracking-widest text-[10px] block mb-2">The Ego (The WHO)</strong>
-                      The Captain's bridge; the bright, narrow beam of a flashlight. Focuses on the Persona and social survival.
+              <motion.div key="acorn" initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 50 }} className="space-y-8">
+                <div className="p-8 border-[12px] border-black bg-[#FFFF00] shadow-[20px_20px_0_#000] relative">
+                  <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-white px-6 py-2 border-[6px] border-black font-black uppercase text-2xl rotate-[-2deg] shadow-[6px_6px_0_#000]">
+                    The Origin!
+                  </div>
+                  
+                  <Compass size={80} className="mx-auto mb-8 mt-4 text-black" />
+                  <h2 className="text-5xl font-black uppercase mb-6 text-center">The Acorn & The Oak</h2>
+                  
+                  <div className="bg-white border-[6px] border-black p-6 text-xl font-bold uppercase mb-8 shadow-[8px_8px_0_#00E5FF]">
+                    Individuation is the slow, geological incarnation of all innate potentials. We align the navigating identity (The Ego) with the soul's vast potential (The Self).
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="p-6 bg-black text-white border-[6px] border-white shadow-[8px_8px_0_#FF0055] transform rotate-1">
+                      <strong className="text-[#00E5FF] uppercase font-black text-2xl block mb-2 border-b-[4px] border-[#00E5FF] pb-2">The Ego</strong>
+                      <p className="font-bold text-lg leading-tight">The Captain's bridge; the flashlight. Focuses on the Persona and survival.</p>
                     </div>
-                    <div className="p-4 bg-black/50 border border-white/5 rounded-lg">
-                      <strong className="text-rose-400 uppercase tracking-widest text-[10px] block mb-2">The Self (The WHAT)</strong>
-                      The entire ocean; the holographic source code. The God-image driving toward wholeness.
+                    <div className="p-6 bg-white text-black border-[6px] border-black shadow-[8px_8px_0_#00FF66] transform -rotate-1">
+                      <strong className="text-[#FF0055] uppercase font-black text-2xl block mb-2 border-b-[4px] border-[#FF0055] pb-2">The Self</strong>
+                      <p className="font-bold text-lg leading-tight">The entire ocean; the holographic source code. The drive toward wholeness.</p>
                     </div>
                   </div>
                 </div>
@@ -72,70 +88,85 @@ export default function IndividuationOdysseyModule({ setPage }: { setPage: (p: s
             )}
 
             {phase === 'midlife' && (
-              <motion.div key="midlife" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-8">
-                <div className="p-8 border border-red-500/30 bg-red-900/10 backdrop-blur-sm rounded-2xl">
-                  <ShieldAlert size={48} className="mb-6 text-red-400" />
-                  <h2 className="text-3xl italic mb-4 text-red-100">The Crisis of the Ego</h2>
-                  <p className="text-lg leading-relaxed text-red-200/70 mb-6">
-                    The Acorn's pressure bursts the shell. The Ego—the proud young king—is forced to surrender its pride. It must move from Alexander-like conquest to humble service to the Self.
-                  </p>
-                  <ul className="space-y-4 font-sans text-sm text-red-200/90">
-                    <li className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-red-500" /> Fragmented Identity: The old social mask no longer fits.</li>
-                    <li className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-red-500" /> Limbic Hijack: Survival brain overwhelms the frontal cortex.</li>
-                    <li className="flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-red-500" /> Reality Mismatch: Old neural programs fail the current reality.</li>
-                  </ul>
+              <motion.div key="midlife" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 1.1 }} className="space-y-8">
+                <div className="p-8 border-[12px] border-black bg-[#FF0055] text-white shadow-[20px_20px_0_#000] transform rotate-1 relative">
+                  <ShieldAlert size={80} className="mx-auto mb-6 text-white animate-bounce" />
+                  <h2 className="text-6xl font-black uppercase mb-6 text-center" style={{ textShadow: '4px 4px 0 #000' }}>Crisis!</h2>
+                  
+                  <div className="bg-black text-white border-[6px] border-white p-6 text-xl font-bold uppercase mb-8 shadow-[8px_8px_0_#FFFF00]">
+                    The Acorn's pressure bursts the shell! The Ego must surrender its pride and serve the Self.
+                  </div>
+                  
+                  <div className="space-y-4">
+                    {[
+                      "Fragmented Identity: The old mask breaks!",
+                      "Limbic Hijack: Survival brain attacks!",
+                      "Reality Mismatch: Old neural programs fail!"
+                    ].map((item, i) => (
+                      <div key={i} className="bg-white text-black font-black uppercase p-4 border-[4px] border-black shadow-[6px_6px_0_#000] text-xl flex items-center gap-4">
+                        <div className="w-8 h-8 bg-[#FF0055] border-[4px] border-black rounded-full flex-shrink-0" />
+                        {item}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </motion.div>
             )}
 
             {phase === 'shadow' && (
-              <motion.div key="shadow" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-8">
-                <div className="p-8 border border-gray-700 bg-gray-900/30 backdrop-blur-sm rounded-2xl flex flex-col md:flex-row gap-8 items-center">
-                  <div className="flex-1">
-                    <h2 className="text-3xl italic mb-4">The Augean Stables</h2>
-                    <p className="text-lg leading-relaxed text-gray-400 mb-6">
-                      The second half of life is a circular descent. You must confront the Shadow—the neglected psychological "dung" that the proud Ego left behind.
-                    </p>
-                    <div className="font-sans text-sm p-4 bg-black/50 border-l-2 border-indigo-500 text-gray-300">
-                      "The overwhelming rage we feel toward the faults of others is a map back to the denied self."
+              <motion.div key="shadow" initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -50 }} className="space-y-8">
+                <div className="p-8 border-[12px] border-black bg-black text-white shadow-[20px_20px_0_#00E5FF] flex flex-col md:flex-row gap-8 items-center relative overflow-hidden">
+                  <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')] opacity-30 mix-blend-overlay" />
+                  
+                  <div className="flex-1 relative z-10">
+                    <h2 className="text-5xl font-black uppercase mb-6 text-[#00E5FF]" style={{ textShadow: '2px 2px 0 #fff' }}>The Shadows</h2>
+                    <div className="bg-white text-black p-6 border-[6px] border-[#00E5FF] font-bold text-xl uppercase mb-6 transform -rotate-1 shadow-[8px_8px_0_#FF0055]">
+                      You must confront the neglected psychological "dung" that the proud Ego left behind.
+                    </div>
+                    <div className="p-6 bg-[#FF0055] border-[6px] border-black font-black uppercase text-xl shadow-[6px_6px_0_#000] transform rotate-2">
+                      "Rage toward others is a map back to the denied self."
                     </div>
                   </div>
-                  <div className="w-48 h-48 rounded-full bg-gradient-to-br from-gray-800 to-black border-4 border-gray-700 flex items-center justify-center shadow-[0_0_50px_rgba(0,0,0,1)] inset-shadow">
-                    <div className="text-gray-500 font-sans font-black tracking-widest text-xs uppercase">The Void</div>
+                  
+                  <div className="w-64 h-64 rounded-full bg-black border-[12px] border-white flex items-center justify-center shadow-[0_0_50px_rgba(0,229,255,1)] relative z-10 animate-pulse">
+                    <div className="text-white font-black uppercase text-4xl text-center leading-none" style={{ textShadow: '2px 2px 0 #FF0055' }}>
+                      THE<br/>VOID
+                    </div>
                   </div>
                 </div>
               </motion.div>
             )}
 
             {phase === 'coherence' && (
-              <motion.div key="coherence" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-8">
-                <div className="p-8 border border-emerald-500/30 bg-emerald-900/10 backdrop-blur-sm rounded-2xl text-center">
-                  <Heart size={48} className={`mx-auto mb-6 ${somaticState.hr === 60 ? 'text-emerald-400 animate-pulse' : 'text-orange-400'}`} />
-                  <h2 className="text-3xl italic mb-4">Somatic Diagnostics</h2>
-                  <p className="text-lg leading-relaxed text-gray-400 mb-8">
-                    Integration requires moving from theoretical understanding to somatic regulation. Stabilize the physiological bridge between the heart and brain.
-                  </p>
+              <motion.div key="coherence" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 1.1 }} className="space-y-8">
+                <div className="p-8 border-[12px] border-black bg-[#00E5FF] shadow-[20px_20px_0_#000] text-center relative">
+                  <Heart size={80} className={`mx-auto mb-6 text-black ${somaticState.hr === 60 ? 'animate-pulse text-[#FF0055]' : ''}`} />
+                  <h2 className="text-6xl font-black uppercase mb-6 text-black" style={{ textShadow: '4px 4px 0 #fff' }}>Coherence!</h2>
                   
-                  <div className="flex justify-center gap-8 font-sans mb-8">
-                    <div className="text-center">
-                      <div className="text-3xl font-black text-white">{somaticState.hr} <span className="text-xs text-gray-500">BPM</span></div>
-                      <div className="text-[10px] uppercase tracking-widest text-gray-500 mt-1">Heart Rate</div>
+                  <div className="bg-white border-[6px] border-black p-6 text-xl font-bold uppercase mb-8 shadow-[8px_8px_0_#000]">
+                    Integration requires moving from theoretical understanding to somatic regulation!
+                  </div>
+                  
+                  <div className="flex flex-wrap justify-center gap-6 mb-12">
+                    <div className="bg-black text-white p-6 border-[6px] border-[#00FF66] shadow-[8px_8px_0_#000] transform -rotate-2 w-40">
+                      <div className="text-5xl font-black">{somaticState.hr}</div>
+                      <div className="text-xs uppercase font-black bg-[#00FF66] text-black px-2 mt-2">BPM</div>
                     </div>
-                    <div className="text-center">
-                      <div className="text-3xl font-black text-white">{somaticState.hrv} <span className="text-xs text-gray-500">ms</span></div>
-                      <div className="text-[10px] uppercase tracking-widest text-gray-500 mt-1">HRV (Vagal Tone)</div>
+                    <div className="bg-black text-white p-6 border-[6px] border-[#FFFF00] shadow-[8px_8px_0_#000] transform rotate-1 w-40">
+                      <div className="text-5xl font-black">{somaticState.hrv}</div>
+                      <div className="text-xs uppercase font-black bg-[#FFFF00] text-black px-2 mt-2">HRV (ms)</div>
                     </div>
-                    <div className="text-center">
-                      <div className={`text-xl font-black mt-2 ${somaticState.hr === 60 ? 'text-emerald-400' : 'text-orange-400'}`}>{somaticState.emotion}</div>
-                      <div className="text-[10px] uppercase tracking-widest text-gray-500 mt-1">System State</div>
+                    <div className="bg-black text-white p-6 border-[6px] border-[#FF0055] shadow-[8px_8px_0_#000] transform -rotate-1 w-40">
+                      <div className={`text-2xl font-black uppercase ${somaticState.hr === 60 ? 'text-[#00FF66]' : 'text-[#FF0055]'}`}>{somaticState.emotion}</div>
+                      <div className="text-xs uppercase font-black bg-[#FF0055] text-white px-2 mt-2">State</div>
                     </div>
                   </div>
 
                   <button 
                     onClick={triggerTIPP}
-                    className="px-8 py-4 bg-emerald-600 text-white font-sans font-black uppercase text-xs tracking-widest rounded-full hover:bg-emerald-500 transition-colors shadow-[0_0_20px_rgba(16,185,129,0.3)]"
+                    className="w-full py-6 bg-[#FF0055] text-white font-black uppercase text-3xl border-[8px] border-black shadow-[12px_12px_0_#000] hover:bg-[#FFFF00] hover:text-black transition-colors"
                   >
-                    Initiate T.I.P.P. Protocol (De-escalate)
+                    Initiate T.I.P.P. Protocol!
                   </button>
                 </div>
               </motion.div>

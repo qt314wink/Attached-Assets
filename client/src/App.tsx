@@ -433,18 +433,20 @@ const SystemsPage = () => (
 
       <div className="grid lg:grid-cols-3 gap-0 border-t-4 border-[#fef3c7]">
         {[
-          { title: "Ingestion", icon: <Database />, color: "hover:bg-violet-600", desc: "Data normalization at scale." },
-          { title: "Inference", icon: <Cpu />, color: "hover:bg-coral-500", desc: "Multi-model orchestration." },
-          { title: "Governance", icon: <ShieldCheck />, color: "hover:bg-[#a3e635]", desc: "Deterministic safety layers." }
-        ].map((item, i) => (
+          { title: "Ingestion", icon: Database, color: "hover:bg-violet-600", desc: "Data normalization at scale." },
+          { title: "Inference", icon: Cpu, color: "hover:bg-coral-500", desc: "Multi-model orchestration." },
+          { title: "Governance", icon: ShieldCheck, color: "hover:bg-[#a3e635]", desc: "Deterministic safety layers." }
+        ].map((item, i) => {
+          const IconComponent = item.icon;
+          return (
           <div key={i} className={`p-12 border-r-4 last:border-r-0 border-b-4 lg:border-b-0 border-[#fef3c7] transition-all group cursor-pointer ${item.color} hover:text-black`}>
             <div className="mb-8 group-hover:rotate-12 transition-transform">
-              {React.cloneElement(item.icon as React.ReactElement, { size: 64, strokeWidth: 2.5 })}
+              <IconComponent size={64} strokeWidth={2.5} />
             </div>
             <h3 className="text-3xl font-black uppercase mb-4">{item.title}</h3>
             <p className="text-[#fef3c7]/60 group-hover:text-black font-bold uppercase text-xs leading-relaxed">{item.desc}</p>
           </div>
-        ))}
+        )})}
       </div>
     </div>
   </div>

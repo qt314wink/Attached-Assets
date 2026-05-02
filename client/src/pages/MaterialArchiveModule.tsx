@@ -14,16 +14,16 @@ import imgLenticular from '@assets/Slide_1777310563561_1777745432516.png';
 import imgRehabilitation from '@assets/Slide_1777307590408_1777745432517.png';
 
 const MATERIALS = [
-  { id: 'thermo', name: 'Thermochromic Molecule', src: imgThermochromic, desc: 'Leuco Dyes (Closed vs Open) responding to heat.' },
-  { id: 'guilloche', name: 'Guilloche & Rainbow', src: imgGuilloche, desc: 'Algorithmic geometric elements and offset security printing.' },
-  { id: 'structural', name: 'Structural Color', src: imgStructuralColor, desc: 'Metallic vs Holographic threads.' },
-  { id: 'topography', name: 'Topography of Touch', src: imgTopography, desc: 'Mechanical vs Chemical alteration on the Z-Axis.' },
-  { id: 'architectural', name: 'Architectural Textiles', src: imgArchitectural, desc: 'Form-active structures via CNC knitting.' },
-  { id: 'visuo', name: 'Visuo-Haptic Paradigm', src: imgVisuoHaptic, desc: 'Simultaneous computation of visual appearance and physical microgeometry.' },
-  { id: 'loom', name: 'The Loom Framework', src: imgLoomFramework, desc: 'Rigid Matrix, Origami Matrix, and Volatile Fiber.' },
-  { id: 'animate', name: 'Animate Materials Spectrum', src: imgAnimateSpectrum, desc: 'From Active & Adaptive to Proto-Living / Biomaterials.' },
-  { id: 'lenticular', name: 'Lenticular Lens', src: imgLenticular, desc: 'Voxel Lens Exploder with VeroClear and VeroVivid.' },
-  { id: 'rehab', name: 'Rehabilitation Protocol', src: imgRehabilitation, desc: 'Reality first, then action. The transition to accountability.' }
+  { id: 'thermo', name: 'Thermochromic', src: imgThermochromic, desc: 'Heat-reactive Leuco Dyes!' },
+  { id: 'guilloche', name: 'Guilloche', src: imgGuilloche, desc: 'Algorithmic offset security!' },
+  { id: 'structural', name: 'Structural Color', src: imgStructuralColor, desc: 'Holographic threads!' },
+  { id: 'topography', name: 'Topography', src: imgTopography, desc: 'Z-Axis tactile alteration!' },
+  { id: 'architectural', name: 'Architectural', src: imgArchitectural, desc: 'CNC knitted active structures!' },
+  { id: 'visuo', name: 'Visuo-Haptic', src: imgVisuoHaptic, desc: 'Visual + physical microgeometry!' },
+  { id: 'loom', name: 'Loom Framework', src: imgLoomFramework, desc: 'Rigid vs Volatile matrices!' },
+  { id: 'animate', name: 'Animate Spectrum', src: imgAnimateSpectrum, desc: 'Proto-living biomaterials!' },
+  { id: 'lenticular', name: 'Lenticular Lens', src: imgLenticular, desc: 'Voxel Lens Exploder!' },
+  { id: 'rehab', name: 'Rehabilitation', src: imgRehabilitation, desc: 'Reality first, then action.' }
 ];
 
 export default function MaterialArchiveModule({ setPage }: { setPage: (p: string) => void }) {
@@ -43,81 +43,88 @@ export default function MaterialArchiveModule({ setPage }: { setPage: (p: string
   };
 
   return (
-    <div className="pt-32 pb-24 px-6 bg-[#0f172a] min-h-screen relative text-white font-sans">
-      <div className="max-w-7xl mx-auto relative z-10">
-        <button 
-          onClick={() => setPage('home')}
-          className="flex items-center gap-2 font-black uppercase mb-8 text-slate-400 hover:text-white transition-colors w-fit text-sm"
-        >
-          <ArrowLeft size={16} /> Retreat to Nexus
-        </button>
+    <div className="pt-32 pb-24 px-6 bg-[#FFFF00] min-h-screen relative text-black font-sans selection:bg-black selection:text-[#FFFF00]">
+      {/* Halftone Background */}
+      <div className="absolute inset-0 opacity-20 pointer-events-none mix-blend-multiply" style={{ backgroundImage: 'radial-gradient(circle, #000 2px, transparent 2.5px)', backgroundSize: '16px 16px' }} />
 
-        <div className="flex flex-col lg:flex-row gap-12">
+      <div className="max-w-[1400px] mx-auto relative z-10">
+        
+        <header className="mb-12 bg-white border-[12px] border-black p-8 shadow-[20px_20px_0_#FF0055] relative flex flex-col md:flex-row justify-between items-start md:items-end">
+          <div>
+             <button 
+              onClick={() => setPage('home')}
+              className="flex items-center gap-2 font-black uppercase mb-6 text-white bg-black hover:bg-[#00FF66] hover:text-black px-6 py-3 border-[4px] border-black transition-colors w-fit text-sm shadow-[6px_6px_0_#000]"
+            >
+              <ArrowLeft size={20} /> Back
+            </button>
+            <h1 className="text-6xl md:text-8xl font-black uppercase leading-[0.8] tracking-tighter text-black" style={{ textShadow: '4px 4px 0 #00E5FF, 8px 8px 0 #000' }}>
+              Material<br/>Archive
+            </h1>
+          </div>
+          <div className="bg-black text-[#FFFF00] font-black uppercase px-6 py-3 border-[4px] border-white shadow-[8px_8px_0_#00FF66] transform rotate-3 text-2xl mt-6 md:mt-0 flex items-center gap-4">
+             <Microscope /> Lab Scan!
+          </div>
+        </header>
+
+        <div className="flex flex-col lg:flex-row gap-8">
+          
           {/* Sidebar */}
-          <div className="lg:w-1/3 flex flex-col h-[calc(100vh-200px)]">
-            <div className="mb-8">
-              <span className="text-[#38bdf8] font-black uppercase tracking-[0.3em] text-xs block mb-2">
-                // MATERIA MEDICA
-              </span>
-              <h1 className="text-4xl font-black uppercase leading-none mb-4">
-                Animate<br/>Materials
-              </h1>
-              <p className="text-sm font-bold text-slate-400">
-                Explore the tactical convergence of structural color, visuo-haptic printing, and programmable matter.
-              </p>
-            </div>
+          <div className="lg:w-1/3 flex flex-col h-[calc(100vh-300px)] bg-white border-[8px] border-black shadow-[16px_16px_0_#000] p-6 relative z-20">
+             <div className="absolute -top-6 -left-6 bg-[#FF0055] text-white p-4 border-[6px] border-black rotate-[-10deg] shadow-[6px_6px_0_#000]">
+                <Layers size={32} />
+             </div>
+            <h2 className="text-3xl font-black uppercase mb-6 border-b-[6px] border-black pb-4 pl-12 text-black">
+              Specimens
+            </h2>
 
-            <div className="flex-1 overflow-y-auto space-y-2 pr-4 custom-scrollbar">
+            <div className="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar">
               {MATERIALS.map(m => (
                 <button
                   key={m.id}
                   onClick={() => { setActiveId(m.id); setZoomMode(false); }}
-                  className={`w-full text-left p-4 border-2 transition-all flex items-center justify-between group ${
+                  className={`w-full text-left p-4 border-[4px] transition-all flex flex-col items-start gap-2 group ${
                     activeId === m.id 
-                      ? 'bg-[#38bdf8] border-[#38bdf8] text-slate-900' 
-                      : 'border-slate-800 text-slate-300 hover:border-slate-600'
+                      ? 'bg-[#00FF66] border-black text-black shadow-[6px_6px_0_#000] translate-x-1' 
+                      : 'bg-white border-black text-black hover:bg-gray-100 shadow-[4px_4px_0_#000]'
                   }`}
                 >
-                  <div>
-                    <div className="font-black text-sm uppercase mb-1">{m.name}</div>
-                    <div className={`text-[10px] ${activeId === m.id ? 'text-slate-800' : 'text-slate-500'}`}>
-                      {m.desc.substring(0, 40)}...
-                    </div>
+                  <div className="font-black text-xl uppercase leading-none">{m.name}</div>
+                  <div className={`font-bold text-xs uppercase px-2 py-1 ${activeId === m.id ? 'bg-black text-white' : 'bg-gray-200 text-black border-2 border-black'}`}>
+                    {m.desc.substring(0, 30)}...
                   </div>
-                  <Layers size={16} className={`transition-opacity ${activeId === m.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-50'}`} />
                 </button>
               ))}
             </div>
           </div>
 
           {/* Main Viewer */}
-          <div className="lg:w-2/3 flex flex-col">
-            <div className="flex items-center justify-between bg-slate-900 p-4 border-t-2 border-x-2 border-slate-800">
-              <div className="font-mono text-xs text-[#38bdf8] uppercase flex items-center gap-2">
-                <Microscope size={14} /> Scan Target: {activeMaterial.name}
+          <div className="lg:w-2/3 flex flex-col bg-white border-[12px] border-black shadow-[20px_20px_0_#00E5FF] p-6 relative">
+            <div className="flex items-center justify-between border-b-[8px] border-black pb-6 mb-6">
+              <div className="font-black text-2xl text-black uppercase flex items-center gap-4">
+                <span className="bg-black text-[#FFFF00] px-3 py-1 border-[4px] border-black">Target</span> {activeMaterial.name}
               </div>
               <button 
                 onClick={() => setZoomMode(!zoomMode)}
-                className={`px-4 py-2 font-black uppercase text-xs flex items-center gap-2 border-2 transition-all ${
-                  zoomMode ? 'bg-[#ff6b6b] border-[#ff6b6b] text-white' : 'border-slate-700 text-slate-400 hover:text-white hover:border-slate-500'
+                className={`px-6 py-3 font-black uppercase text-xl flex items-center gap-2 border-[4px] border-black shadow-[6px_6px_0_#000] transition-transform hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[10px_10px_0_#000] ${
+                  zoomMode ? 'bg-[#FF0055] text-white' : 'bg-[#00E5FF] text-black'
                 }`}
               >
-                <ZoomIn size={14} /> {zoomMode ? 'Disable Micro-Scan' : 'Enable Micro-Scan'}
+                <ZoomIn size={24} /> {zoomMode ? 'Reset' : 'Zoom In!'}
               </button>
             </div>
 
             <div 
               ref={containerRef}
               onMouseMove={handleMouseMove}
-              className={`relative flex-1 min-h-[500px] border-2 border-slate-800 bg-black overflow-hidden flex items-center justify-center ${zoomMode ? 'cursor-crosshair' : 'cursor-default'}`}
+              className={`relative flex-1 min-h-[500px] border-[8px] border-black bg-[#E5E5E5] overflow-hidden flex items-center justify-center shadow-[inset_12px_12px_0_rgba(0,0,0,0.1)] ${zoomMode ? 'cursor-crosshair' : 'cursor-default'}`}
             >
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activeMaterial.id}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
+                  initial={{ opacity: 0, scale: 0.8, rotate: -5 }}
+                  animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                  exit={{ opacity: 0, scale: 1.2, rotate: 5 }}
+                  transition={{ duration: 0.4 }}
                   className="absolute inset-0 w-full h-full"
                 >
                   {zoomMode ? (
@@ -130,31 +137,36 @@ export default function MaterialArchiveModule({ setPage }: { setPage: (p: string
                       }}
                     />
                   ) : (
-                    <img 
-                      src={activeMaterial.src} 
-                      alt={activeMaterial.name}
-                      className="w-full h-full object-contain p-4"
-                    />
+                    <div className="w-full h-full p-8 flex items-center justify-center">
+                       <img 
+                        src={activeMaterial.src} 
+                        alt={activeMaterial.name}
+                        className="max-w-full max-h-full object-contain shadow-[16px_16px_0_#000] border-[8px] border-black bg-white"
+                      />
+                    </div>
                   )}
                 </motion.div>
               </AnimatePresence>
 
               {zoomMode && (
-                <div className="absolute bottom-6 left-6 bg-black/80 backdrop-blur text-[#38bdf8] font-mono text-xs p-4 border border-slate-800 pointer-events-none">
-                  <div className="font-black uppercase mb-2 text-white flex items-center gap-2">
-                    <Maximize size={14} /> Telemetry
+                <div className="absolute bottom-6 left-6 bg-white text-black font-black uppercase p-6 border-[6px] border-black pointer-events-none shadow-[8px_8px_0_#000] transform rotate-2">
+                  <div className="text-xl mb-2 flex items-center gap-2 bg-[#FF0055] text-white px-2 w-fit">
+                    <Maximize size={20} /> Telemetry!
                   </div>
-                  <div>X_COORD: {mousePos.x.toFixed(2)}%</div>
-                  <div>Y_COORD: {mousePos.y.toFixed(2)}%</div>
-                  <div className="text-[#ff6b6b] mt-1">&gt; LENS MAGNIFICATION: 2.5x</div>
+                  <div className="text-2xl leading-none mb-1">X: {mousePos.x.toFixed(1)}%</div>
+                  <div className="text-2xl leading-none">Y: {mousePos.y.toFixed(1)}%</div>
+                  <div className="text-sm mt-2 text-[#00E5FF] bg-black px-2 py-1">2.5X MAGNIFICATION</div>
                 </div>
               )}
             </div>
             
-            <div className="mt-4 p-6 bg-slate-900 border border-slate-800 font-mono text-sm leading-relaxed text-slate-300">
-              <span className="text-[#c4ff00]">&gt; SYSTEM NOTE:</span> {activeMaterial.desc}
+            {/* Description Footer */}
+            <div className="mt-6 p-6 bg-black border-[6px] border-white font-black uppercase text-xl leading-tight text-white shadow-[8px_8px_0_#000]">
+              <span className="text-[#00FF66] bg-white px-2 py-1 mr-4 border-2 border-black inline-block transform -rotate-2">DATA:</span> 
+              {activeMaterial.desc}
             </div>
           </div>
+
         </div>
       </div>
     </div>

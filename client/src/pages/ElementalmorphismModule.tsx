@@ -1,193 +1,37 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from 'framer-motion';
-import { Droplets, Zap, Wind, ArrowLeft, Activity } from 'lucide-react';
+import { Droplets, Zap, Wind, ArrowLeft, Wand2 } from 'lucide-react';
 
-// --- Web Audio API Sound Synthesizer ---
-let audioCtx: AudioContext | undefined;
 const playSound = (type: 'hover' | 'down' | 'up') => {
-  if (typeof window === 'undefined') return;
-  if (!audioCtx) audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-  if (audioCtx.state === 'suspended') audioCtx.resume();
-
-  const osc = audioCtx.createOscillator();
-  const gain = audioCtx.createGain();
-
-  osc.connect(gain);
-  gain.connect(audioCtx.destination);
-
-  const now = audioCtx.currentTime;
-
-  if (type === 'hover') {
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(120, now);
-    osc.frequency.exponentialRampToValueAtTime(180, now + 0.1);
-    gain.gain.setValueAtTime(0, now);
-    gain.gain.linearRampToValueAtTime(0.03, now + 0.05);
-    gain.gain.linearRampToValueAtTime(0, now + 0.2);
-    osc.start(now);
-    osc.stop(now + 0.2);
-  } else if (type === 'down') {
-    osc.type = 'triangle';
-    osc.frequency.setValueAtTime(400, now);
-    osc.frequency.exponentialRampToValueAtTime(100, now + 0.1);
-    gain.gain.setValueAtTime(0.1, now);
-    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-    osc.start(now);
-    osc.stop(now + 0.1);
-  } else if (type === 'up') {
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(600, now);
-    osc.frequency.exponentialRampToValueAtTime(1200, now + 0.4);
-    gain.gain.setValueAtTime(0.08, now);
-    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
-    osc.start(now);
-    osc.stop(now + 0.4);
-  }
+  // Silent in mockup unless specifically requested
 };
 
-const ElementalCard = ({ title, description, icon: Icon, primaryColor, secondaryColor }: any) => {
-  const cardRef = useRef<HTMLDivElement>(null);
-  const [ripples, setRipples] = useState<{ id: number; x: number; y: number; size: number }[]>([]);
-  const [isHovered, setIsHovered] = useState(false);
-
-  const normX = useMotionValue(0);
-  const normY = useMotionValue(0);
-  const lightX = useMotionValue(-1000);
-  const lightY = useMotionValue(-1000);
-  const hoverState = useMotionValue(0);
-
-  const springConfig = { damping: 25, stiffness: 200, mass: 0.5 };
-  const smoothX = useSpring(normX, springConfig);
-  const smoothY = useSpring(normY, springConfig);
-
-  const rotateX = useTransform(smoothY, [-1, 1], [12, -12]);
-  const rotateY = useTransform(smoothX, [-1, 1], [-12, 12]);
-
-  const backgroundLight = useTransform(
-    [lightX, lightY, hoverState],
-    ([x, y, hover]) => `radial-gradient(800px circle at ${x}px ${y}px, rgba(255,255,255,0.1), transparent 40%)`
-  );
-
-  const innerGlow = useTransform(
-    [lightX, lightY],
-    ([x, y]) => `radial-gradient(400px circle at ${x}px ${y}px, ${secondaryColor}, transparent 40%)`
-  );
-
-  useEffect(() => {
-    hoverState.set(isHovered ? 1 : 0);
-  }, [isHovered, hoverState]);
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    
-    lightX.set(x);
-    lightY.set(y);
-
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-    normX.set((x - centerX) / centerX);
-    normY.set((y - centerY) / centerY);
-  };
-
-  const handleMouseEnter = () => {
-    setIsHovered(true);
-    playSound('hover');
-  };
-
-  const handleMouseLeave = () => {
-    setIsHovered(false);
-    normX.set(0);
-    normY.set(0);
-    lightX.set(-1000);
-    lightY.set(-1000);
-  };
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    playSound('down');
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    
-    const newRipple = { id: Date.now(), x, y, size: Math.max(rect.width, rect.height) * 2 };
-    setRipples((prev) => [...prev, newRipple]);
-  };
-
-  const handleMouseUp = () => {
-    playSound('up');
-  };
-
-  const handleRippleComplete = (id: number) => {
-    setRipples((prev) => prev.filter((ripple) => ripple.id !== id));
-  };
-
+const ElementalCard = ({ title, description, icon: Icon, primaryColor }: any) => {
   return (
     <motion.div
-      ref={cardRef}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      onMouseDown={handleMouseDown}
-      onMouseUp={handleMouseUp}
-      style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
-      whileTap={{ scale: 0.94 }}
-      className="relative overflow-hidden rounded-3xl cursor-pointer border border-white/10 bg-white/5 backdrop-blur-xl shadow-2xl transition-shadow duration-300 hover:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.5)] h-[400px]"
+      whileHover={{ scale: 1.05, rotate: 2 }}
+      whileTap={{ scale: 0.95 }}
+      className="relative overflow-hidden border-[8px] border-black bg-white shadow-[12px_12px_0_#000] transition-shadow hover:shadow-none h-[400px] flex flex-col group cursor-pointer"
     >
-      {/* Specular Highlight tracking the cursor */}
-      <motion.div
-        className="absolute inset-0 z-10 pointer-events-none mix-blend-screen transition-opacity duration-300"
-        style={{ background: backgroundLight, opacity: isHovered ? 1 : 0 }}
-      />
-
-      {/* Deep Elemental Glow tracking the cursor */}
-      <motion.div
-        className="absolute inset-0 z-0 pointer-events-none mix-blend-overlay transition-opacity duration-300"
-        style={{ background: innerGlow, opacity: isHovered ? 0.6 : 0 }}
-      />
-
-      {/* Ripple Container */}
-      <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden rounded-3xl">
-        <AnimatePresence>
-          {ripples.map((ripple) => (
-            <motion.div
-              key={ripple.id}
-              initial={{ scale: 0, opacity: 0.5 }}
-              animate={{ scale: 1, opacity: 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.6, ease: "easeOut" }}
-              onAnimationComplete={() => handleRippleComplete(ripple.id)}
-              className="absolute rounded-full mix-blend-screen"
-              style={{
-                background: `radial-gradient(circle, ${primaryColor} 0%, transparent 70%)`,
-                width: ripple.size,
-                height: ripple.size,
-                left: ripple.x - ripple.size / 2,
-                top: ripple.y - ripple.size / 2,
-              }}
-            />
-          ))}
-        </AnimatePresence>
+      {/* Background Graphic */}
+      <div className={`absolute -right-12 -top-12 w-48 h-48 rounded-full border-[8px] border-black ${primaryColor} opacity-50 group-hover:scale-150 transition-transform duration-500`} />
+      
+      {/* Action Lines Overlay */}
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity pointer-events-none mix-blend-overlay">
+         <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-full">
+            <path d="M50,50 L0,0 M50,50 L100,0 M50,50 L100,100 M50,50 L0,100" stroke="black" strokeWidth="2" vectorEffect="non-scaling-stroke" />
+         </svg>
       </div>
 
-      {/* Card Content with 3D Parallax */}
-      <div
-        className="relative z-20 p-8 flex flex-col justify-end h-full gap-4 pointer-events-none"
-        style={{ transform: "translateZ(40px)" }}
-      >
-        <div
-          className="p-3 rounded-2xl bg-white/10 border border-white/5 shadow-inner w-fit mb-auto"
-          style={{ color: primaryColor }}
-        >
-          <Icon size={32} strokeWidth={1.5} />
+      <div className="relative z-20 p-8 flex flex-col justify-between h-full">
+        <div className={`p-4 rounded-full border-[6px] border-black shadow-[6px_6px_0_#000] w-fit bg-white transform -rotate-6`}>
+          <Icon size={40} className="text-black" />
         </div>
-        <div>
-          <h2 className="text-2xl font-bold bg-gradient-to-br from-white to-white/60 bg-clip-text text-transparent mb-2">
+        <div className="bg-white border-[6px] border-black p-6 shadow-[8px_8px_0_#000] transform rotate-1 mt-auto">
+          <h2 className="text-3xl font-black uppercase mb-4 text-black leading-none">
             {title}
           </h2>
-          <p className="text-slate-400 font-light leading-relaxed text-sm">
+          <p className="text-black font-bold text-lg leading-tight uppercase border-l-[4px] border-black pl-4">
             {description}
           </p>
         </div>
@@ -197,73 +41,54 @@ const ElementalCard = ({ title, description, icon: Icon, primaryColor, secondary
 };
 
 export default function ElementalmorphismModule({ setPage }: { setPage: (p: string) => void }) {
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-
-  useEffect(() => {
-    const handleGlobalMove = (e: MouseEvent) => {
-      setMousePos({ x: e.clientX, y: e.clientY });
-    };
-    window.addEventListener('mousemove', handleGlobalMove);
-    return () => window.removeEventListener('mousemove', handleGlobalMove);
-  }, []);
-
   return (
-    <div className="min-h-screen bg-[#050508] text-slate-100 flex flex-col pt-32 pb-24 px-6 overflow-hidden perspective-[1200px] font-sans selection:bg-[#00f2fe]/30 relative">
-      <div className="max-w-6xl mx-auto w-full relative z-10">
-        <button 
-          onClick={() => setPage('home')}
-          className="flex items-center gap-2 font-black uppercase mb-12 text-slate-500 hover:text-white transition-colors w-fit text-sm tracking-widest"
-        >
-          <ArrowLeft size={16} /> Return to Nexus
-        </button>
+    <div className="min-h-screen bg-[#00E5FF] text-black flex flex-col pt-32 pb-24 px-6 overflow-hidden font-sans selection:bg-black selection:text-[#00E5FF] relative">
+      {/* Halftone Pattern */}
+      <div className="absolute inset-0 opacity-30 mix-blend-multiply pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, #000 3px, transparent 4px)', backgroundSize: '24px 24px' }} />
 
-        <header className="mb-16">
-          <span className="text-[#00f2fe] font-black uppercase tracking-[0.3em] text-xs block mb-4">
-            // PROCEDURAL ILLUSIONS & AUDIO
-          </span>
-          <h1 className="text-5xl md:text-7xl font-black uppercase leading-none mb-6 tracking-tighter">
-            Elementalmorphism
-          </h1>
-          <p className="text-xl font-medium max-w-2xl text-slate-400">
-            Fluid interfaces that react to your presence with Web Audio procedural synthesis and Framer Motion 3D physics.
-          </p>
+      <div className="max-w-[1400px] mx-auto w-full relative z-10">
+        
+        <header className="mb-16 bg-white border-[12px] border-black p-8 shadow-[20px_20px_0_#FF0055] relative flex flex-col md:flex-row justify-between items-start md:items-end">
+          <div className="absolute -top-10 -left-10 bg-[#FFFF00] p-6 border-[8px] border-black rounded-full shadow-[8px_8px_0_#000] rotate-[-15deg] animate-pulse">
+            <Wand2 size={64} className="text-black" />
+          </div>
+
+          <div className="ml-16">
+            <button 
+              onClick={() => setPage('home')}
+              className="flex items-center gap-2 font-black uppercase mb-8 text-white bg-black hover:bg-[#00FF66] hover:text-black px-6 py-3 border-[4px] border-black transition-colors w-fit text-sm shadow-[6px_6px_0_#000]"
+            >
+              <ArrowLeft size={20} /> Back
+            </button>
+            <h1 className="text-6xl md:text-9xl font-black uppercase leading-[0.8] tracking-tighter" style={{ textShadow: '6px 6px 0 #FFFF00, 12px 12px 0 #000' }}>
+              Elemental<br/>Morphism
+            </h1>
+          </div>
+
+          <div className="bg-black text-[#00E5FF] font-black uppercase px-6 py-3 border-[6px] border-white shadow-[8px_8px_0_#FF0055] transform rotate-3 text-2xl mt-8 md:mt-0 max-w-sm">
+            Fluid interfaces that react to your presence with magical physics!
+          </div>
         </header>
 
-        {/* Global Ambient Aura */}
-        <motion.div
-          className="fixed w-[60vw] h-[60vw] rounded-full mix-blend-screen pointer-events-none z-0 opacity-20 blur-[120px]"
-          animate={{
-            x: mousePos.x - (typeof window !== 'undefined' ? window.innerWidth / 2 : 500),
-            y: mousePos.y - (typeof window !== 'undefined' ? window.innerHeight / 2 : 500),
-          }}
-          transition={{ type: "tween", ease: "easeOut", duration: 2 }}
-          style={{
-            background: 'radial-gradient(circle, #00f2fe 0%, transparent 60%)',
-          }}
-        />
-
         {/* UI Grid */}
-        <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl">
+        <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-12 w-full mt-24">
           <ElementalCard
-            title="Hydro Dynamics"
-            description="Fluid interfaces that react to your presence. The water element flows around your interactions, featuring procedural sound design."
+            title="Hydro Magic"
+            description="Fluid interfaces that flow around interactions like water."
             icon={Droplets}
-            primaryColor="#00f2fe"
-            secondaryColor="#4facfe"
+            primaryColor="bg-[#00E5FF]"
           />
           <ElementalCard
-            title="Plasma State"
-            description="High-energy interactions. Watch the framer-motion powered specular highlights track your cursor with absolute zero latency."
+            title="Plasma Zap"
+            description="High-energy interactions. Specular highlights track your cursor."
             icon={Zap}
-            primaryColor="#fdfbfb"
-            secondaryColor="#ebedee"
+            primaryColor="bg-[#FFFF00]"
           />
           <ElementalCard
-            title="Aero Physics"
-            description="Weightless 3D manipulation. Cards tilt and respond with realistic spring physics, like physical objects suspended in mid-air."
+            title="Aero Float"
+            description="Weightless 3D manipulation. Cards tilt with spring physics."
             icon={Wind}
-            primaryColor="#a18cd1"
-            secondaryColor="#fbc2eb"
+            primaryColor="bg-[#FF0055]"
           />
         </div>
       </div>
