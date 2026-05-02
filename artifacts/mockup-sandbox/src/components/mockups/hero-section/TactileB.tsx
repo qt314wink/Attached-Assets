@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import heroImage from '@assets/image_1777749324005.webp';
 import './_group.css';
 
 export function TactileB() {
@@ -32,7 +31,7 @@ export function TactileB() {
           >
             {/* The Image as a "dyed fabric" */}
             <div className="absolute inset-0 bg-gradient-to-tr from-[#2C3E7E] via-transparent to-[#FF9F1C] mix-blend-color z-10 opacity-40 group-hover:opacity-20 transition-opacity duration-500" />
-            <img src={heroImage} alt="Textile Art" className="w-full h-full object-cover object-center filter contrast-125 saturate-50" />
+            <img src="/images/hero-tactile.webp" alt="Textile Art" className="w-full h-full object-cover object-center filter contrast-125 saturate-50" />
             
             {/* Stitching detail */}
             <div className="absolute inset-4 border border-dashed border-white/50 rounded-[1.2rem] pointer-events-none" />

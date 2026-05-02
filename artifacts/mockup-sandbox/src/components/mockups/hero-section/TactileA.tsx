@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import heroImage from '@assets/image_1777749324005.webp';
 import './_group.css';
 
 export function TactileA() {
@@ -24,7 +23,7 @@ export function TactileA() {
     >
       {/* Background Image with Shytech integration */}
       <div className="absolute inset-0 z-0 opacity-20 mix-blend-luminosity pointer-events-none">
-        <img src={heroImage} alt="Background" className="w-full h-full object-cover object-center" />
+        <img src="/images/hero-tactile.webp" alt="Background" className="w-full h-full object-cover object-center" />
       </div>
 
       <div className="relative z-10 w-full max-w-7xl mx-auto px-8 flex flex-col md:flex-row items-center gap-16">

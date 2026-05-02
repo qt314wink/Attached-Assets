@@ -1,7 +1,16 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './_group.css';
 
-function PhysicsCard({ title, tier, desc, bgColors, shadowColor, delay }) {
+interface PhysicsCardProps {
+  title: string;
+  tier: string;
+  desc: string;
+  bgColors: string[];
+  shadowColor: string;
+  delay: number;
+}
+
+function PhysicsCard({ title, tier, desc, bgColors, shadowColor, delay }: PhysicsCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const rAFRef = useRef<number | null>(null);
   const [tilt, setTilt] = useState({ active: false, mouseX: 0, mouseY: 0 });
