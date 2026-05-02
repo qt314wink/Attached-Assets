@@ -1,163 +1,134 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Sparkles, Moon, Sun, Combine, FileText, LayoutTemplate } from 'lucide-react';
+import { ArrowLeft, Sparkles, Database, Mountain, Hexagon, Feather } from 'lucide-react';
 
 export default function MythOSModule({ setPage }: { setPage: (p: string) => void }) {
-  const [step, setStep] = useState(1);
-  const [selectedLenses, setSelectedLenses] = useState<string[]>([]);
-  const [domain, setDomain] = useState('');
-  const [reading, setReading] = useState(false);
+  const [phase, setPhase] = useState<'dump' | 'socratic' | 'lexicon' | 'result'>('dump');
+  const [socraticStep, setSocraticStep] = useState(0);
+  const [styleSignature, setStyleSignature] = useState<string>('');
 
-  const lenses = [
-    { id: 'gene_keys', name: 'Gene Keys', desc: 'Shadows & Siddhis' },
-    { id: 'astrocartography', name: 'Astrocartography', desc: 'Geographical resonance' },
-    { id: 'human_design', name: 'Human Design', desc: 'Energy architecture' },
-    { id: 'tarot', name: 'Archetypal Tarot', desc: 'Mythic narrative beats' },
-    { id: 'psych', name: 'Psychological', desc: 'Parts work & attachment' }
+  const questions = [
+    {
+      q: "If this interface were a physical structure, what is its materiality?",
+      optA: { text: "Temple of Data (Glass, Light, Silence)", icon: <Database />, sig: "Monolith" },
+      optB: { text: "Stone & Echoes (Weathered, Heavy, Tactile)", icon: <Mountain />, sig: "Organism" }
+    },
+    {
+      q: "If found in a thrift store in 50 years, why would someone keep it?",
+      optA: { text: "Because it's a flawless mechanical instrument.", icon: <Hexagon />, sig: "High-Tech" },
+      optB: { text: "Because it holds a mythic, ancient energy.", icon: <Feather />, sig: "Primordial" }
+    }
   ];
 
-  const toggleLens = (id: string) => {
-    if (selectedLenses.includes(id)) {
-      setSelectedLenses(selectedLenses.filter(l => l !== id));
+  const handleSocraticChoice = (sig: string) => {
+    setStyleSignature(prev => prev ? `${prev} + ${sig}` : sig);
+    if (socraticStep < questions.length - 1) {
+      setSocraticStep(prev => prev + 1);
     } else {
-      setSelectedLenses([...selectedLenses, id]);
+      setPhase('lexicon');
     }
   };
 
-  const generateReading = () => {
-    if (selectedLenses.length === 0 || !domain) return;
-    setStep(3);
-    setReading(true);
-    setTimeout(() => {
-      setReading(false);
-      setStep(4);
-    }, 3000);
-  };
-
   return (
-    <div className="pt-32 pb-24 px-6 bg-[#1a1a2e] min-h-screen relative text-[#f8fafc] overflow-hidden font-serif">
-      {/* Esoteric Background */}
-      <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-10" />
-      <div className="absolute -top-64 -right-64 w-[500px] h-[500px] bg-indigo-500/20 rounded-full blur-[100px]" />
-      <div className="absolute -bottom-64 -left-64 w-[500px] h-[500px] bg-rose-500/20 rounded-full blur-[100px]" />
-
-      <div className="max-w-5xl mx-auto relative z-10">
-        <button 
+    <div className="pt-32 pb-24 px-6 bg-[#0a0a0a] min-h-screen relative text-slate-200 overflow-hidden font-serif">
+      <div className="max-w-4xl mx-auto relative z-10">
+         <button 
           onClick={() => setPage('home')}
-          className="flex items-center gap-2 font-black uppercase mb-12 text-[#94a3b8] hover:text-white transition-all w-fit font-sans text-xs tracking-widest"
+          className="flex items-center gap-2 font-sans font-black uppercase mb-12 text-slate-500 hover:text-white transition-all w-fit text-xs tracking-widest"
         >
           <ArrowLeft size={16} /> Return to Nexus
         </button>
 
-        <div className="text-center mb-16">
-          <motion.div animate={{ rotate: 360 }} transition={{ duration: 20, repeat: Infinity, ease: "linear" }} className="inline-block mb-4">
-            <Combine size={48} className="text-rose-400" />
-          </motion.div>
-          <h1 className="text-5xl md:text-7xl font-light italic mb-4">MythOS</h1>
-          <p className="text-sm font-sans tracking-[0.3em] uppercase text-indigo-300">The Harmonic Astrocartographer</p>
-        </div>
+        <header className="mb-16 text-center">
+          <h1 className="text-5xl md:text-7xl font-light italic mb-4">Aesthetic Intelligence</h1>
+          <p className="text-sm font-sans tracking-[0.3em] uppercase text-indigo-400">The Socratic Descent</p>
+        </header>
 
-        <div className="max-w-2xl mx-auto">
-          <AnimatePresence mode="wait">
-            {step === 1 && (
-              <motion.div key="step1" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-8 bg-white/5 p-8 backdrop-blur-md border border-white/10 rounded-2xl">
-                <h2 className="text-2xl italic text-center">Where shall we direct the lens?</h2>
-                <div className="grid grid-cols-1 gap-4 font-sans">
-                  {['Vocation & Purpose', 'Relationships & Attachment', 'Creativity & Output', 'Spiritual Growth'].map(d => (
-                    <button 
-                      key={d}
-                      onClick={() => { setDomain(d); setStep(2); }}
-                      className="p-4 border border-white/20 rounded-lg hover:bg-white/10 transition-colors text-left font-bold"
-                    >
-                      {d}
-                    </button>
-                  ))}
-                </div>
-              </motion.div>
-            )}
+        <AnimatePresence mode="wait">
+          {phase === 'dump' && (
+            <motion.div key="dump" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-6">
+              <h2 className="text-2xl text-center italic text-slate-300">Phase 1: The Sacred Dump</h2>
+              <p className="text-center font-sans text-sm text-slate-500">Provide your messiest, noisiest intent. The system will witness it.</p>
+              <textarea 
+                className="w-full h-48 bg-white/5 border border-white/10 rounded-xl p-6 font-sans text-slate-300 focus:outline-none focus:border-indigo-500 transition-colors resize-none"
+                placeholder="Pour your unrefined ideas here..."
+              />
+              <button 
+                onClick={() => setPhase('socratic')}
+                className="w-full py-4 bg-indigo-600/20 text-indigo-400 font-sans font-black uppercase text-xs tracking-widest rounded-xl hover:bg-indigo-600 hover:text-white transition-all border border-indigo-500/30"
+              >
+                Initiate Alchemical Machine
+              </button>
+            </motion.div>
+          )}
 
-            {step === 2 && (
-              <motion.div key="step2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-8 bg-white/5 p-8 backdrop-blur-md border border-white/10 rounded-2xl">
-                <h2 className="text-2xl italic text-center">Select your modalities.</h2>
-                <p className="text-center text-sm font-sans text-gray-400 mb-8">Focus: {domain}</p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 font-sans">
-                  {lenses.map(l => (
-                    <button 
-                      key={l.id}
-                      onClick={() => toggleLens(l.id)}
-                      className={`p-4 border rounded-lg text-left transition-all ${selectedLenses.includes(l.id) ? 'bg-indigo-500/20 border-indigo-400 text-indigo-100' : 'border-white/10 text-gray-400 hover:border-white/30'}`}
-                    >
-                      <div className="font-bold mb-1">{l.name}</div>
-                      <div className="text-xs opacity-70">{l.desc}</div>
-                    </button>
-                  ))}
-                </div>
+          {phase === 'socratic' && (
+            <motion.div key="socratic" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="space-y-12">
+              <div className="text-center space-y-2">
+                <h2 className="text-2xl italic text-slate-300">Phase 2: "This or That"</h2>
+                <p className="font-sans text-xs text-slate-500 uppercase tracking-widest">Identifying the Negative Space</p>
+              </div>
+              <h3 className="text-3xl text-center font-light mb-12">{questions[socraticStep].q}</h3>
+              
+              <div className="grid md:grid-cols-2 gap-6">
                 <button 
-                  onClick={generateReading}
-                  disabled={selectedLenses.length === 0}
-                  className="w-full mt-8 bg-rose-500 text-white font-sans font-black uppercase tracking-widest py-4 rounded-lg hover:bg-rose-400 transition-colors disabled:opacity-50"
+                  onClick={() => handleSocraticChoice(questions[socraticStep].optA.sig)}
+                  className="group relative p-12 border-2 border-white/5 hover:border-indigo-500 bg-white/5 hover:bg-indigo-900/20 rounded-2xl transition-all flex flex-col items-center justify-center gap-6"
                 >
-                  Synthesize Reading
+                  <div className="text-slate-600 group-hover:text-indigo-400 transition-colors">
+                    {questions[socraticStep].optA.icon}
+                  </div>
+                  <span className="font-sans font-bold text-sm text-center">{questions[socraticStep].optA.text}</span>
                 </button>
-              </motion.div>
-            )}
-
-            {step === 3 && (
-              <motion.div key="step3" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center justify-center py-20">
-                <motion.div 
-                  animate={{ scale: [1, 1.2, 1], rotate: [0, 180, 360] }} 
-                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                >
-                  <Sun size={64} className="text-rose-400 mix-blend-screen absolute" />
-                  <Moon size={64} className="text-indigo-400 mix-blend-screen" />
-                </motion.div>
-                <p className="mt-12 font-sans font-bold tracking-widest uppercase text-sm animate-pulse">
-                  Synthesizing {selectedLenses.length} lenses...
-                </p>
-                <p className="text-xs font-sans text-gray-500 mt-2">Normalizing symbolic data into structured themes.</p>
-              </motion.div>
-            )}
-
-            {step === 4 && (
-              <motion.div key="step4" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
-                <div className="bg-white/5 p-8 backdrop-blur-md border border-white/10 rounded-2xl">
-                  <div className="flex items-center justify-between mb-8 pb-4 border-b border-white/10">
-                    <h2 className="text-3xl italic">The Storm Walker</h2>
-                    <span className="font-sans text-xs tracking-widest uppercase bg-rose-500/20 text-rose-300 px-3 py-1 rounded-full">Archetype Discovered</span>
-                  </div>
-
-                  <div className="space-y-6 text-slate-300 leading-relaxed text-lg">
-                    <p>
-                      You are not a fortune teller. You are a pattern interpreter. Based on the synthesis of {selectedLenses.join(', ')} through the lens of {domain}, a distinct geometry emerges.
-                    </p>
-                    <p>
-                      <strong className="text-rose-300 font-sans uppercase text-sm tracking-wide">The Shadow Pattern:</strong><br/>
-                      The Invisible Achiever. You tend to operate in the background, letting your work speak for itself out of a fear of visibility (Gene Key 4 Shadow of Intolerance combined with a strong 12th house astrological placement).
-                    </p>
-                    <p>
-                      <strong className="text-indigo-300 font-sans uppercase text-sm tracking-wide">The Gift Expression:</strong><br/>
-                      When integrated, this transforms into the 'Silent Reservoir'. You become a stabilizing force, holding deep energetic space for others without needing to dominate the narrative.
-                    </p>
-                  </div>
-
-                  <div className="mt-10 p-6 bg-indigo-900/20 border border-indigo-500/30 rounded-xl font-sans">
-                    <h4 className="font-black uppercase text-sm mb-4 text-indigo-300 flex items-center gap-2"><Sparkles size={16}/> Actionable Insight</h4>
-                    <p className="text-sm text-indigo-100">
-                      Experiment with claiming space in small increments. Next time you feel the urge to retreat into the background during a collaborative process, deliberately anchor your voice in the room. This is not about ego; it is about claiming your geometric position in the network.
-                    </p>
-                  </div>
-                </div>
-
                 <button 
-                  onClick={() => { setStep(1); setSelectedLenses([]); setDomain(''); }}
-                  className="mx-auto block font-sans font-black uppercase text-xs tracking-widest text-gray-500 hover:text-white transition-colors"
+                  onClick={() => handleSocraticChoice(questions[socraticStep].optB.sig)}
+                  className="group relative p-12 border-2 border-white/5 hover:border-rose-500 bg-white/5 hover:bg-rose-900/20 rounded-2xl transition-all flex flex-col items-center justify-center gap-6"
                 >
-                  Initiate New Reading
+                  <div className="text-slate-600 group-hover:text-rose-400 transition-colors">
+                    {questions[socraticStep].optB.icon}
+                  </div>
+                  <span className="font-sans font-bold text-sm text-center">{questions[socraticStep].optB.text}</span>
                 </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+              </div>
+            </motion.div>
+          )}
+
+          {phase === 'lexicon' && (
+            <motion.div key="lexicon" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-8 text-center">
+              <h2 className="text-3xl italic text-slate-300">Phase 3: The Definition Lab</h2>
+              <p className="text-lg text-slate-500 font-sans">You seek the <strong className="text-white">"Minimal"</strong> aesthetic. We must map your semantic dialect.</p>
+              <div className="p-8 bg-indigo-900/10 border border-indigo-500/20 rounded-2xl space-y-6 max-w-xl mx-auto">
+                <p className="font-sans text-sm text-indigo-300">Does "Minimal" mean...</p>
+                <div className="grid gap-4">
+                  <button onClick={() => setPhase('result')} className="p-4 bg-black/40 border border-white/10 hover:border-white/50 rounded-lg font-sans text-sm transition-all text-left">
+                    A. Cold, white, and clinical (Apple Aesthetic)
+                  </button>
+                  <button onClick={() => setPhase('result')} className="p-4 bg-black/40 border border-white/10 hover:border-white/50 rounded-lg font-sans text-sm transition-all text-left">
+                    B. Warm, high-craft, and natural (Uncluttered but textured)
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {phase === 'result' && (
+            <motion.div key="result" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="space-y-8 text-center">
+              <div className="w-32 h-32 mx-auto rounded-full bg-gradient-to-br from-indigo-500 to-rose-500 flex items-center justify-center mb-8 animate-pulse shadow-[0_0_50px_rgba(99,102,241,0.4)]">
+                <Sparkles size={48} className="text-white" />
+              </div>
+              <h2 className="text-4xl italic text-white">The Threshold Reached</h2>
+              <p className="text-xl text-slate-400 font-sans">
+                You are no longer an operator. You are an orchestrator.
+              </p>
+              <div className="p-6 bg-white/5 border border-white/10 rounded-xl inline-block text-left mt-8">
+                <div className="text-[10px] font-sans uppercase tracking-widest text-slate-500 mb-2">Your Derived Style Signature</div>
+                <div className="font-black text-2xl font-sans text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-rose-400">
+                  {styleSignature || "High-Tech Primordial"}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

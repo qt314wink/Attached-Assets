@@ -1,0 +1,368 @@
+```react
+import React, { useRef, useState } from 'react';
+import { Fingerprint, Zap, Waves, X } from 'lucide-react';
+
+// --- STYLES: Injected directly for the single-file environment ---
+// In a real project, this would be a separate CSS module or global stylesheet.
+const jellyStyles = `
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap');
+
+  :root {
+    --bg-ocean: #05050f;
+    --cyan-glow: rgba(0, 255, 255, 0.6);
+    --magenta-glow: rgba(255, 0, 255, 0.4);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-highlight: rgba(255, 255, 255, 0.4);
+  }
+
+  body {
+    background-color: var(--bg-ocean);
+    color: white;
+    font-family: 'Outfit', sans-serif;
+    margin: 0;
+    overflow-x: hidden;
+    background-image: 
+      radial-gradient(circle at 15% 50%, rgba(0, 255, 255, 0.03) 0%, transparent 50%),
+      radial-gradient(circle at 85% 30%, rgba(255, 0, 255, 0.03) 0%, transparent 50%);
+  }
+
+  /* --- JELLY CARD --- */
+  .jelly-card {
+    position: relative;
+    background: rgba(20, 20, 40, 0.3);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 30px;
+    border: 1px solid var(--glass-border);
+    border-top: 1px solid var(--glass-highlight);
+    border-left: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 
+      0 30px 40px rgba(0, 0, 0, 0.6),
+      inset 0 4px 10px rgba(255, 255, 255, 0.3),
+      inset 0 -10px 30px rgba(0, 255, 255, 0.15),
+      0 0 20px rgba(0, 255, 255, 0.1);
+    
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(0.25, 1.5, 0.5, 1), box-shadow 0.3s ease;
+    will-change: transform;
+    overflow: hidden; /* Contains the glow */
+    cursor: crosshair;
+  }
+
+  /* Removes transition during active hover for smooth 1:1 mouse tracking */
+  .jelly-card.is-hovered {
+    transition: transform 0.1s ease-out;
+  }
+
+  /* The Bioluminescent Core that tracks the mouse */
+  .jelly-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(
+      circle 200px at var(--mouse-x, 50%) var(--mouse-y, 50%), 
+      var(--cyan-glow) 0%, 
+      var(--magenta-glow) 30%, 
+      transparent 70%
+    );
+    z-index: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+    mix-blend-mode: screen;
+  }
+
+  .jelly-card:hover::before {
+    opacity: 1;
+  }
+
+  /* Pushes content into 3D space, sitting above the liquid/glow */
+  .jelly-content {
+    position: relative;
+    z-index: 1;
+    transform: translateZ(40px); /* 3D Parallax Pop */
+    pointer-events: none; /* Let the card handle all mouse events */
+  }
+
+  /* --- JELLY BUTTON --- */
+  .jelly-btn {
+    position: relative;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-top: 1px solid var(--glass-highlight);
+    border-radius: 40px 50px 30px 40px;
+    box-shadow: 
+      0 15px 25px rgba(0, 0, 0, 0.5),
+      0 0 20px 2px rgba(0, 255, 255, 0.3),
+      inset 0 4px 6px rgba(255, 255, 255, 0.6),
+      inset 0 -5px 15px rgba(255, 0, 255, 0.4),
+      inset 0 0 20px rgba(255, 255, 255, 0.1);
+    color: white;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.2s cubic-bezier(0.25, 1.5, 0.5, 1);
+    animation: 
+      morph 6s ease-in-out infinite,
+      breathe 4s ease-in-out infinite alternate;
+  }
+
+  .jelly-btn::before {
+    content: '';
+    position: absolute;
+    top: 20%; left: 20%; width: 60%; height: 60%;
+    background: radial-gradient(circle, rgba(0, 255, 255, 0.8) 0%, rgba(255, 0, 255, 0) 70%);
+    border-radius: 50%;
+    filter: blur(15px);
+    z-index: -1;
+    animation: shiftCore 5s ease-in-out infinite alternate;
+  }
+
+  .jelly-btn:active {
+    transform: scale(0.92) translateY(5px);
+    box-shadow: 
+      0 5px 10px rgba(0, 0, 0, 0.6),
+      0 0 10px 1px rgba(0, 255, 255, 0.4),
+      inset 0 6px 10px rgba(255, 255, 255, 0.7),
+      inset 0 -2px 5px rgba(255, 0, 255, 0.6);
+  }
+
+  /* --- JELLY MODAL --- */
+  .jelly-modal-overlay {
+    background: rgba(5, 5, 15, 0.7);
+    backdrop-filter: blur(8px);
+    animation: fadeIn 0.3s ease forwards;
+  }
+
+  .jelly-modal {
+    background: rgba(25, 25, 45, 0.3);
+    backdrop-filter: blur(40px);
+    border-radius: 40px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-top: 2px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 
+      0 50px 70px rgba(0, 0, 0, 0.8),
+      inset 0 10px 20px rgba(255, 255, 255, 0.1),
+      inset 0 -20px 40px rgba(138, 43, 226, 0.3),
+      0 0 40px rgba(0, 255, 255, 0.1);
+    animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+
+  /* --- KEYFRAMES --- */
+  @keyframes morph {
+    0% { border-radius: 40px 50px 30px 40px; }
+    33% { border-radius: 50px 40px 50px 30px; }
+    66% { border-radius: 30px 50px 40px 50px; }
+    100% { border-radius: 40px 50px 30px 40px; }
+  }
+  @keyframes breathe {
+    0% { box-shadow: 0 15px 25px rgba(0,0,0,0.5), 0 0 20px 2px rgba(0,255,255,0.3), inset 0 4px 6px rgba(255,255,255,0.6), inset 0 -5px 15px rgba(255,0,255,0.4); }
+    100% { box-shadow: 0 15px 25px rgba(0,0,0,0.5), 0 0 35px 8px rgba(0,255,255,0.5), inset 0 4px 6px rgba(255,255,255,0.7), inset 0 -5px 15px rgba(255,0,255,0.6); }
+  }
+  @keyframes shiftCore {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(15px, -10px) scale(1.2); }
+  }
+  @keyframes floatOrganism {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes popIn {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+`;
+
+// --- COMPONENTS ---
+
+const JellyCard = ({ title, description, icon: Icon, delay = '0s' }) => {
+  const cardRef = useRef(null);
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleMouseMove = (e) => {
+    if (!cardRef.current) return;
+    const card = cardRef.current;
+    const rect = card.getBoundingClientRect();
+    
+    // 1. Calculate Glow Position
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    card.style.setProperty('--mouse-x', `${x}px`);
+    card.style.setProperty('--mouse-y', `${y}px`);
+    
+    // 2. Calculate 3D Tilt Physics
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    
+    // Normalize coordinates (-1 to 1)
+    const deltaX = (x - centerX) / centerX;
+    const deltaY = (y - centerY) / centerY;
+    
+    // Max rotation in degrees
+    const maxRotate = 15;
+    const rotateX = deltaY * -maxRotate; 
+    const rotateY = deltaX * maxRotate;  
+    
+    // Apply Transform directly to DOM for 60fps performance (bypassing React State)
+    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(0.98, 0.98, 0.98)`;
+  };
+
+  const handleMouseEnter = () => setIsHovered(true);
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    if (!cardRef.current) return;
+    const card = cardRef.current;
+    // Reset transform. The CSS transition handles the smooth "snap back"
+    card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+  };
+
+  return (
+    <div 
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      className={`jelly-card p-8 min-h-[320px] flex flex-col items-center justify-center text-center ${isHovered ? 'is-hovered' : ''}`}
+      style={{ animation: `floatOrganism 6s ease-in-out infinite ${delay}` }}
+    >
+      <div className="jelly-content flex flex-col items-center">
+        <div className="w-20 h-20 mb-6 rounded-[40%_60%_70%_30%/40%_50%_60%_50%] bg-gradient-to-br from-cyan-400 to-fuchsia-500 shadow-[0_0_20px_rgba(0,255,255,0.5)] flex items-center justify-center animate-[morph_5s_ease-in-out_infinite]">
+          <Icon size={32} className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]" />
+        </div>
+        <h3 className="text-2xl font-bold mb-3 tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-cyan-100 to-white drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">
+          {title}
+        </h3>
+        <p className="text-cyan-50/70 leading-relaxed text-sm">
+          {description}
+        </p>
+      </div>
+    </div>
+  );
+};
+
+const JellyButton = ({ children, onClick, className = '' }) => (
+  <button onClick={onClick} className={`jelly-btn px-10 py-4 text-sm ${className}`}>
+    <span className="relative z-10 drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]">
+      {children}
+    </span>
+  </button>
+);
+
+const JellyModal = ({ isOpen, onClose }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="jelly-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="jelly-modal w-full max-w-md p-8 relative">
+        <button 
+          onClick={onClose}
+          className="absolute top-6 right-6 text-white/50 hover:text-white hover:drop-shadow-[0_0_8px_cyan] transition-all"
+        >
+          <X size={24} />
+        </button>
+        
+        <div className="mb-6 flex items-center gap-4">
+          <div className="p-3 bg-cyan-500/20 rounded-2xl border border-cyan-400/30">
+            <Zap className="text-cyan-400" size={28} />
+          </div>
+          <h2 className="text-2xl font-bold text-cyan-300 drop-shadow-[0_0_15px_rgba(0,255,255,0.6)]">
+            System Override
+          </h2>
+        </div>
+        
+        <p className="text-white/80 line-height-relaxed mb-8 text-lg">
+          Warning: Initializing deep-sea UI protocols will permanently alter the physical properties of your digital environment. Proceed with squish?
+        </p>
+        
+        <div className="flex justify-end gap-4">
+          <button 
+            onClick={onClose}
+            className="px-6 py-3 rounded-2xl text-white/70 hover:text-white transition-colors"
+          >
+            Cancel
+          </button>
+          <JellyButton onClick={onClose} className="!px-8 !py-3 !text-xs">
+            Confirm
+          </JellyButton>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// --- MAIN APP COMPONENT ---
+
+export default function App() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  return (
+    <>
+      {/* Injecting our custom Jelly physics CSS */}
+      <style>{jellyStyles}</style>
+
+      <div className="min-h-screen p-8 md:p-20 relative flex flex-col items-center">
+        
+        {/* Header Section */}
+        <header className="text-center mb-20 relative z-10 mt-10">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-6">
+            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_10px_cyan]"></span>
+            <span className="text-xs uppercase tracking-widest text-white/70 font-medium">Lumina Design Studio</span>
+          </div>
+          <h1 className="text-5xl md:text-7xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-br from-white via-cyan-100 to-fuchsia-300 drop-shadow-[0_0_30px_rgba(0,255,255,0.2)]">
+            Jellymorphic UI.
+          </h1>
+          <p className="text-xl text-white/60 max-w-2xl mx-auto font-light">
+            Fluid geometry. Deep-sea bioluminescence. Tactile 3D physics.
+          </p>
+        </header>
+
+        {/* 3D Interactive Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-6xl mb-20 perspective-1000">
+          <JellyCard 
+            title="Biometric Sync" 
+            description="Organic data interpretation via deep neural liquid networks. Touch to authenticate your presence."
+            icon={Fingerprint}
+            delay="0s"
+          />
+          <JellyCard 
+            title="Fluid Dynamics" 
+            description="Interface adapts its viscosity based on user pressure and velocity. It breathes as you interact."
+            icon={Waves}
+            delay="2s" /* Staggered floating animations */
+          />
+          <JellyCard 
+            title="Energy Core" 
+            description="Harness raw abyssal energy. High-contrast neon gradients contained within frosted silica membranes."
+            icon={Zap}
+            delay="4s"
+          />
+        </div>
+
+        {/* Action Area */}
+        <div className="relative z-10">
+          <JellyButton onClick={() => setIsModalOpen(true)}>
+            Initialize Deep Sea
+          </JellyButton>
+        </div>
+
+        {/* Interactive Modal */}
+        <JellyModal 
+          isOpen={isModalOpen} 
+          onClose={() => setIsModalOpen(false)} 
+        />
+
+      </div>
+    </>
+  );
+}
+
+
+```

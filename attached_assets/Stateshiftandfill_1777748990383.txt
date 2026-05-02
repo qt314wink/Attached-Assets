@@ -1,0 +1,293 @@
+```react
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+
+// =====================================================================
+// 1. LIQUID PHYSICS & SENSORY ENGINE
+// =====================================================================
+const useAudioSynth = () => {
+  const audioCtx = useRef(null);
+
+  const initAudio = () => {
+    if (!audioCtx.current) {
+      audioCtx.current = new (window.AudioContext || window.webkitAudioContext)();
+    }
+  };
+
+  const playTone = (freq, type, duration, vol = 0.1) => {
+    if (!audioCtx.current) return;
+    const osc = audioCtx.current.createOscillator();
+    const gain = audioCtx.current.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, audioCtx.current.currentTime);
+    gain.gain.setValueAtTime(vol, audioCtx.current.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.current.currentTime + duration);
+    osc.connect(gain);
+    gain.connect(audioCtx.current.destination);
+    osc.start();
+    osc.stop(audioCtx.current.currentTime + duration);
+  };
+
+  const playSlurp = () => { initAudio(); playTone(250, 'sine', 0.4, 0.15); setTimeout(() => playTone(450, 'sine', 0.2, 0.1), 100); };
+  const playSplat = () => { initAudio(); playTone(150, 'sawtooth', 0.1, 0.1); };
+  const playPop = () => { initAudio(); playTone(600, 'sine', 0.05, 0.15); };
+
+  return { playSlurp, playSplat, playPop, initAudio };
+};
+
+const triggerHaptic = (pattern) => {
+  if (typeof window !== 'undefined' && window.navigator && window.navigator.vibrate) {
+    window.navigator.vibrate(pattern);
+  }
+};
+
+// =====================================================================
+// 2. REUSABLE LIQUID PRIMITIVES
+// =====================================================================
+
+const SubstanceFilters = () => (
+  <svg className="absolute w-0 h-0 invisible">
+    <defs>
+      {/* GOO: High Viscosity for large merges */}
+      <filter id="goo-viscous" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+        <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 25 -10" result="goo" />
+      </filter>
+      {/* FROTH: Low Viscosity for bubbles */}
+      <filter id="goo-froth">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
+        <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8" result="goo" />
+      </filter>
+    </defs>
+  </svg>
+);
+
+const Drip = ({ color, delay }) => (
+  <div 
+    className={`absolute rounded-full animate-drip-stream ${color}`}
+    style={{ 
+      left: `${Math.random() * 100}%`, 
+      width: `${Math.random() * 20 + 10}px`,
+      animationDelay: delay 
+    }}
+  />
+);
+
+// =====================================================================
+// 3. TACTILE COMPONENTS
+// =====================================================================
+
+const SlopToggle = ({ active, onToggle }) => {
+  const { playSlurp } = useAudioSynth();
+  return (
+    <div 
+      onClick={() => { playSlurp(); triggerHaptic([10, 20]); onToggle(); }}
+      className="relative w-24 h-12 rounded-full cursor-pointer bg-white/40 shadow-inner p-1"
+      style={{ filter: "url(#goo-viscous)" }}
+    >
+      <div className={`absolute inset-0 rounded-full transition-colors duration-500 ${active ? 'bg-mint-400' : 'bg-pink-300'}`} />
+      <div 
+        className="absolute w-10 h-10 bg-white rounded-full transition-all duration-500 ease-spring shadow-md"
+        style={{ left: active ? 'calc(100% - 44px)' : '4px' }}
+      />
+      {/* The Stretch Glob */}
+      <div 
+        className="absolute h-8 bg-white/60 rounded-full transition-all duration-300 opacity-50"
+        style={{ 
+          left: active ? '40%' : '20%', 
+          width: '30px',
+          transform: `scaleX(${active ? 1.5 : 1})`
+        }} 
+      />
+    </div>
+  );
+};
+
+const PaintBleedNav = () => {
+  const [active, setActive] = useState(0);
+  const items = ['SYSTEM', 'VAT', 'DRAIN', 'CORE'];
+  const { playPop } = useAudioSynth();
+
+  return (
+    <div className="relative flex gap-2 p-3 bg-white/60 rounded-[2.5rem] shadow-clay" style={{ filter: "url(#goo-froth)" }}>
+      {items.map((item, i) => (
+        <button 
+          key={item}
+          onClick={() => { playPop(); triggerHaptic(10); setActive(i); }}
+          className={`relative z-10 px-6 py-2 font-black text-sm tracking-widest transition-colors duration-500 ${active === i ? 'text-white' : 'text-purple-900/40'}`}
+        >
+          {item}
+        </button>
+      ))}
+      <div 
+        className="absolute h-10 top-3 bg-purple-500 rounded-full transition-all duration-500 ease-spring shadow-lg"
+        style={{ 
+          left: `${active * 85 + 12}px`, 
+          width: '80px',
+          transform: `scaleX(1.1)` 
+        }} 
+      />
+    </div>
+  );
+};
+
+const DripDrawer = ({ isOpen, onClose }) => {
+  const { playSlurp } = useAudioSynth();
+  return (
+    <>
+      <div className={`fixed inset-0 z-[100] bg-black/30 backdrop-blur-md transition-opacity duration-500 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} onClick={onClose} />
+      <div 
+        className={`fixed bottom-0 left-0 w-full bg-pink-400 z-[110] transition-transform duration-700 ease-spring rounded-t-[5rem] shadow-2xl p-10`}
+        style={{ transform: `translateY(${isOpen ? '0%' : '105%'})` }}
+      >
+        {/* Drip Primitives on Top Edge */}
+        <div className="absolute -top-10 left-0 w-full h-20 pointer-events-none overflow-hidden" style={{ filter: "url(#goo-viscous)" }}>
+          <div className="absolute bottom-0 w-full h-10 bg-pink-400" />
+          {[...Array(12)].map((_, i) => (
+            <div key={i} className="absolute w-16 h-16 bg-pink-400 rounded-full transition-all duration-1000 ease-spring"
+                 style={{ left: `${i * 10}%`, transform: `translateY(${isOpen ? '-5px' : '60px'}) scale(${Math.random() + 0.5})` }} />
+          ))}
+        </div>
+        
+        <div className="max-w-4xl mx-auto text-center py-10">
+          <div className="w-20 h-2 bg-white/40 rounded-full mx-auto mb-10 cursor-pointer" onClick={onClose} />
+          <h2 className="text-7xl font-black text-white tracking-tighter italic mb-10">STORAGE_TANK</h2>
+          <div className="grid grid-cols-2 gap-6">
+            <button className="bg-white text-pink-500 py-6 rounded-[2.5rem] font-black text-2xl shadow-xl active:scale-95 transition-all">ABSORB</button>
+            <button onClick={() => { playSlurp(); onClose(); }} className="bg-black/20 text-white py-6 rounded-[2.5rem] font-black text-2xl shadow-xl active:scale-95 transition-all">DISSOLVE</button>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
+// =====================================================================
+// 4. MAIN WORKSPACE
+// =====================================================================
+
+export default function App() {
+  const [toggle, setToggle] = useState(false);
+  const [drawer, setDrawer] = useState(false);
+  const [sliderVal, setSliderVal] = useState(50);
+  const { initAudio } = useAudioSynth();
+
+  useEffect(() => {
+    const handleInit = () => { initAudio(); window.removeEventListener('click', handleInit); };
+    window.addEventListener('click', handleInit);
+    return () => window.removeEventListener('click', handleInit);
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-[#fdfafb] text-[#2d1b4e] font-sans overflow-x-hidden pb-40">
+      <SubstanceFilters />
+      
+      <style>{`
+        .bg-gradient {
+          background-image: 
+            radial-gradient(circle at 10% 20%, rgba(255, 183, 178, 0.4) 0%, transparent 40%),
+            radial-gradient(circle at 90% 80%, rgba(181, 234, 215, 0.4) 0%, transparent 50%),
+            radial-gradient(circle at 50% 50%, rgba(226, 209, 249, 0.4) 0%, transparent 60%);
+          background-attachment: fixed;
+        }
+        .clay-base {
+          border-radius: 3.5rem;
+          box-shadow: 16px 16px 32px rgba(0, 0, 0, 0.05), inset -8px -8px 16px rgba(0, 0, 0, 0.06), inset 8px 8px 16px rgba(255, 255, 255, 0.8);
+          transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes dripFall { 0% { transform: scaleY(1) translateY(0); opacity: 1; } 100% { transform: scaleY(1.5) translateY(400px); opacity: 0; } }
+        .animate-drip-stream { animation: dripFall 3s infinite cubic-bezier(0.4, 0, 0.2, 1); }
+        .ease-spring { transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1); }
+      `}</style>
+
+      <div className="fixed inset-0 bg-gradient -z-10" />
+
+      {/* NAV SECTION */}
+      <nav className="p-8 flex flex-col md:flex-row justify-between items-center max-w-7xl mx-auto gap-8">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 bg-pink-500 rounded-2xl shadow-lg flex items-center justify-center text-white font-black text-2xl">M</div>
+          <span className="font-black text-4xl tracking-tighter">OS_PRIMITIVE</span>
+        </div>
+        <PaintBleedNav />
+      </nav>
+
+      {/* MAIN CONTENT GRID */}
+      <main className="max-w-7xl mx-auto px-8 pt-12 grid grid-cols-1 md:grid-cols-12 gap-10">
+        
+        {/* Module 1: The Vat Primitive */}
+        <div className="md:col-span-5 bg-white/60 p-12 rounded-[5rem] shadow-clay flex flex-col items-center relative overflow-hidden border border-white/50">
+           <div className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-40">
+             <Drip color="bg-mint-400" delay="0s" />
+             <Drip color="bg-purple-300" delay="1.5s" />
+             <Drip color="bg-pink-300" delay="3s" />
+           </div>
+           
+           <h3 className="font-black text-2xl opacity-20 uppercase tracking-[0.5em] mb-12">Reservoir_01</h3>
+           
+           {/* Slurp Progress Primitive */}
+           <div className="relative w-56 h-56 flex items-center justify-center" style={{ filter: "url(#goo-viscous)" }}>
+              <div className="absolute inset-0 rounded-full border-[12px] border-deep-purple/5 shadow-inner" />
+              <div 
+                className="absolute bottom-0 w-full bg-pink-500 transition-all duration-1000 ease-spring"
+                style={{ 
+                  height: `${sliderVal}%`, 
+                  borderRadius: '40% 60% 70% 30% / 40% 40% 60% 60%',
+                  animation: 'liquidSlosh 5s infinite ease-in-out'
+                }}
+              />
+              <span className="relative z-10 font-black text-6xl text-white mix-blend-overlay">{Math.round(sliderVal)}%</span>
+           </div>
+           
+           <div className="mt-16 flex gap-4 w-full">
+             <button onMouseDown={() => setSliderVal(Math.min(100, sliderVal+15))} className="flex-1 bg-white py-5 rounded-[2.5rem] shadow-clay font-black text-xl active:scale-90 transition-all uppercase">Fill</button>
+             <button onMouseDown={() => setSliderVal(Math.max(0, sliderVal-15))} className="flex-1 bg-white py-5 rounded-[2.5rem] shadow-clay font-black text-xl active:scale-90 transition-all uppercase">Sip</button>
+           </div>
+        </div>
+
+        {/* Module 2: The Control Substrate */}
+        <div className="md:col-span-7 space-y-10">
+           
+           {/* Gooey Slider Primitive */}
+           <div className="bg-white/60 p-12 rounded-[5rem] shadow-clay border border-white/50">
+              <h3 className="font-black text-2xl opacity-20 uppercase tracking-[0.5em] mb-12">Tension_Mechanism</h3>
+              <div className="relative h-24 flex items-center" style={{ filter: "url(#goo-viscous)" }}>
+                 <div className="absolute w-full h-4 bg-purple-100 rounded-full" />
+                 <div className="absolute h-10 bg-mint-400 rounded-full opacity-60 transition-all duration-300"
+                      style={{ left: `calc(${sliderVal}% - 40px)`, width: '80px', transform: `scaleY(${0.8 + Math.abs(50-sliderVal)/100})` }} />
+                 <input 
+                   type="range" min="0" max="100" value={sliderVal} 
+                   onChange={(e) => setSliderVal(e.target.value)}
+                   className="absolute w-full h-full opacity-0 z-50 cursor-pointer"
+                 />
+                 <div className="absolute w-16 h-16 bg-mint-400 rounded-full shadow-lg border-4 border-white/40 z-40" 
+                      style={{ left: `calc(${sliderVal}% - 32px)` }} />
+              </div>
+           </div>
+
+           <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+              {/* Suction Trigger */}
+              <div 
+                className="bg-yellow-300 h-72 rounded-[4.5rem] shadow-clay flex items-center justify-center cursor-pointer group relative overflow-hidden"
+                onClick={() => setDrawer(true)}
+              >
+                 <div className="absolute inset-0 bg-white/40 scale-0 group-hover:scale-150 transition-transform duration-1000 rounded-full blur-3xl" />
+                 <span className="relative z-10 font-black text-5xl tracking-tighter italic">DRAIN</span>
+              </div>
+
+              {/* Slop Toggle Module */}
+              <div className="bg-white/60 p-10 rounded-[4.5rem] shadow-clay flex flex-col items-center justify-center border border-white/50">
+                 <h3 className="font-black text-lg opacity-20 uppercase tracking-widest mb-10">State_Shift</h3>
+                 <SlopToggle active={toggle} onToggle={() => setToggle(!toggle)} />
+              </div>
+           </div>
+
+        </div>
+      </main>
+
+      {/* OVERLAY PRIMITIVES */}
+      <DripDrawer isOpen={drawer} onClose={() => setDrawer(false)} />
+
+    </div>
+  );
+}
+
+```
