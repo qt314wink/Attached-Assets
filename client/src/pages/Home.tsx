@@ -25,13 +25,7 @@ export default function Home({ setPage }: { setPage: (p: string) => void }) {
                { title: "Liquid Physics", icon: <Waves size={32}/>, color: "bg-pink-200", id: "module-liquid" },
                { title: "Soft UI Logic", icon: <Box size={32}/>, color: "bg-slate-200", id: "module-neumorphic" },
                { title: "Inner Odyssey", icon: <BrainCircuit size={32}/>, color: "bg-indigo-200", id: "module-individuation" },
-               { title: "Component Forge", icon: <Code2 size={32}/>, color: "bg-orange-200", id: "module-labyrinth" },
-               { title: "Sentient UX", icon: <Globe size={32}/>, color: "bg-teal-200", id: "module-biomimesis" },
-               { title: "Agentic Sandbox", icon: <Users size={32}/>, color: "bg-blue-200", id: "module-visionaries" },
-               { title: "SVG Matrix", icon: <Palette size={32}/>, color: "bg-rose-200", id: "module-stylematrix" },
-               { title: "Elementalmorphism", icon: <Box size={32}/>, color: "bg-emerald-200", id: "module-elemental" },
-               { title: "Paradox of Power", icon: <Network size={32}/>, color: "bg-amber-200", id: "module-sovereignty" },
-               { title: "Graffiti Typewriter", icon: <PenTool size={32}/>, color: "bg-red-200", id: "module-graffiti" }
+               { title: "Component Forge", icon: <Code2 size={32}/>, color: "bg-orange-200", id: "module-labyrinth" }
              ].map((item, idx) => (
                <motion.div 
                  key={idx}
