@@ -49,7 +49,3 @@ export const modules: ModuleMap = {
   "./components/mockups/hero-section/VibeB.tsx": () => import("../components/mockups/hero-section/VibeB.tsx"),
   "./components/mockups/hero-section/VibeC.tsx": () => import("../components/mockups/hero-section/VibeC.tsx")
 };
-export * from "./mockups/hero-section/ApproachA_Terminal";
-export * from "./mockups/hero-section/ApproachB_Canvas";
-export * from "./mockups/hero-section/ApproachC_Cinematic";
-export * from "./mockups/hero-section/ApproachD_Dashboard";
