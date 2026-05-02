@@ -42,7 +42,7 @@ export function ComicHero({ setPage }: { setPage: (p: string) => void }) {
                 <h2 className="text-4xl font-black uppercase mb-4" style={{ WebkitTextStroke: '2px black' }}>The Forge</h2>
                 <p className="font-bold mb-6 text-xl border-l-[6px] border-black group-hover:border-white pl-4 transition-colors">Build custom UI objects.</p>
                 <button className="bg-black text-white font-black uppercase px-6 py-3 hover:text-[#FFFF00] border-[6px] border-black group-hover:border-white transition-colors shadow-[4px_4px_0_#000]">
-                  Access >>
+                  Access &gt;&gt;
                 </button>
               </div>
             </div>
