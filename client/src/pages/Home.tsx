@@ -124,6 +124,16 @@ export default function Home({ setPage }: { setPage: (p: string) => void }) {
       desc: "Words that shatter the grid. Typography as an explosive, physical element. SMASH!",
       span: "md:col-span-6 md:row-span-1",
       type: "wide"
+    },
+    { 
+      title: "Tactile Synthesis", 
+      icon: <Layers size={48}/>, 
+      color: "bg-[#00FF66]", 
+      id: "module-tactile", 
+      narrative: "Vol 13: Drag & Drop Alchemy",
+      desc: "Pick up the pieces. Feel the weight. Combine them in the crucible. Tactility is the new logic.",
+      span: "md:col-span-12 md:row-span-2",
+      type: "banner"
     }
   ];
 
@@ -147,7 +157,7 @@ export default function Home({ setPage }: { setPage: (p: string) => void }) {
               </h2>
             </div>
             <div className="bg-black text-white font-black uppercase px-6 py-2 md:px-8 md:py-3 border-[6px] border-white shadow-[8px_8px_0_#FFFF00] transform rotate-2 mt-8 md:mt-0 text-xl md:text-2xl self-start md:self-end">
-              12 Issues Included!
+              13 Issues Included!
             </div>
           </div>
 

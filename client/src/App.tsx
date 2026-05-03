@@ -31,6 +31,7 @@ import SemanticLexiconModule from './pages/SemanticLexiconModule';
 import ElementalmorphismModule from './pages/ElementalmorphismModule';
 import SovereigntyParadoxModule from './pages/SovereigntyParadoxModule';
 import GraffitiTypewriterModule from './pages/GraffitiTypewriterModule';
+import TactileSynthesisModule from './pages/TactileSynthesisModule';
 
 const GLITCH_VARIANTS = {
   initial: { skew: 0, x: 0 },
@@ -497,6 +498,7 @@ export default function App() {
             {page === 'module-elemental' && <ElementalmorphismModule setPage={setPage} />}
             {page === 'module-sovereignty' && <SovereigntyParadoxModule setPage={setPage} />}
             {page === 'module-graffiti' && <GraffitiTypewriterModule setPage={setPage} />}
+            {page === 'module-tactile' && <TactileSynthesisModule setPage={setPage} />}
           </motion.div>
         </AnimatePresence>
       </main>

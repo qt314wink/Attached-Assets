@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Volume2, PenTool, Download, SlidersHorizontal, Image as ImageIcon, Type, Sparkles, Wand2, Palette } from 'lucide-react';
+import { ArrowLeft, PenTool, Download, SlidersHorizontal, Image as ImageIcon, Type, Wand2, Palette, Trash2 } from 'lucide-react';
 
 // Web Audio API for Typewriter Clack
 let audioCtx: AudioContext | undefined;
@@ -57,7 +57,9 @@ const playBellSound = () => {
 // --- Add custom fonts to the document ---
 const loadFonts = () => {
   if (typeof document === 'undefined') return;
+  if (document.getElementById('graffiti-fonts')) return;
   const link = document.createElement('link');
+  link.id = 'graffiti-fonts';
   link.href = 'https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Sedgwick+Ave+Display&family=Creepster&family=Rubik+Glitch&family=Bungee+Shade&display=swap';
   link.rel = 'stylesheet';
   document.head.appendChild(link);
@@ -65,10 +67,11 @@ const loadFonts = () => {
 
 export default function GraffitiTypewriterModule({ setPage }: { setPage: (p: string) => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   
   // Settings
   const [styleMode, setStyleMode] = useState<'graffiti' | 'neobrutalist' | 'gooey' | 'comic' | 'boxy'>('graffiti');
-  const [bgColor, setBgColor] = useState('#E5E5E5');
+  const [bgColor, setBgColor] = useState('#FFFF00');
   const [fillColor, setFillColor] = useState('#FF0055');
   const [strokeColor, setStrokeColor] = useState('#000000');
   const [patternEnabled, setPatternEnabled] = useState(false);
@@ -83,7 +86,7 @@ export default function GraffitiTypewriterModule({ setPage }: { setPage: (p: str
 
   const [showOverlay, setShowOverlay] = useState(true);
   const hasStartedTypingRef = useRef(false);
-  const posRef = useRef({ x: 50, y: 100 });
+  const posRef = useRef({ x: 60, y: 120 });
   const charsDrawn = useRef(0);
 
   useEffect(() => {
@@ -110,16 +113,13 @@ export default function GraffitiTypewriterModule({ setPage }: { setPage: (p: str
   const handleGenerate = () => {
     if (!prompt) return;
     setIsGenerating(true);
-    // Simulate generation delay then apply changes
     setTimeout(() => {
       setIsGenerating(false);
-      // Randomly change some settings to simulate "applying" the generated style
-      const randomColor = `hsl(${Math.random() * 360}, 80%, 50%)`;
+      const randomColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
       setFillColor(randomColor);
       setPatternEnabled(Math.random() > 0.5);
       setGradientEnabled(Math.random() > 0.5);
       setPrompt("");
-      // Draw a massive generative element
       drawGenerativeElement();
     }, 1500);
   };
@@ -133,7 +133,7 @@ export default function GraffitiTypewriterModule({ setPage }: { setPage: (p: str
     ctx.save();
     ctx.globalCompositeOperation = 'overlay';
     
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 8; i++) {
         ctx.beginPath();
         ctx.moveTo(Math.random() * canvas.width, Math.random() * canvas.height);
         ctx.bezierCurveTo(
@@ -141,8 +141,8 @@ export default function GraffitiTypewriterModule({ setPage }: { setPage: (p: str
             Math.random() * canvas.width, Math.random() * canvas.height,
             Math.random() * canvas.width, Math.random() * canvas.height
         );
-        ctx.lineWidth = Math.random() * 40 + 10;
-        ctx.strokeStyle = `hsla(${Math.random() * 360}, 100%, 50%, 0.5)`;
+        ctx.lineWidth = Math.random() * 60 + 20;
+        ctx.strokeStyle = `hsla(${Math.random() * 360}, 100%, 50%, 0.6)`;
         ctx.lineCap = 'round';
         ctx.stroke();
     }
@@ -159,14 +159,14 @@ export default function GraffitiTypewriterModule({ setPage }: { setPage: (p: str
     if (char === 'Enter') {
       playBellSound();
       posRef.current.y += fontSize * 1.5;
-      posRef.current.x = 50;
+      posRef.current.x = 60;
       return;
     }
 
     if (char === 'Backspace') {
       playTypewriterSound();
-      posRef.current.x = Math.max(50, posRef.current.x - (fontSize * 0.7));
-      ctx.clearRect(posRef.current.x - (fontSize * 0.5), posRef.current.y - fontSize, fontSize * 1.2, fontSize * 1.5);
+      posRef.current.x = Math.max(60, posRef.current.x - (fontSize * 0.7));
+      ctx.clearRect(posRef.current.x - (fontSize * 0.5), posRef.current.y - fontSize * 1.2, fontSize * 1.5, fontSize * 1.8);
       return;
     }
 
@@ -200,7 +200,6 @@ export default function GraffitiTypewriterModule({ setPage }: { setPage: (p: str
         break;
       case 'neobrutalist':
         fontStr = `900 ${fontSize}px monospace`;
-        // Snap to grid-like offset
         break;
       case 'gooey':
         rot = Math.sin(charsDrawn.current) * 0.2;
@@ -224,33 +223,31 @@ export default function GraffitiTypewriterModule({ setPage }: { setPage: (p: str
     ctx.rotate(rot);
     ctx.scale(scale, scale);
 
-    // Font Setup
     ctx.font = fontStr;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'alphabetic';
 
-    // Measure text for accurate backgrounds
     const metrics = ctx.measureText(char.toUpperCase());
     const charW = metrics.width;
     
-    // 1. Draw Background Element (depending on style)
+    // Background Element
     if (styleMode === 'neobrutalist') {
         ctx.fillStyle = '#000';
         ctx.fillRect(-charW/2 - 10, -fontSize + 10, charW + 20, fontSize + 10);
         ctx.fillStyle = fillColor;
         ctx.fillRect(-charW/2 - 15, -fontSize + 5, charW + 20, fontSize + 10);
         ctx.strokeStyle = '#000';
-        ctx.lineWidth = 4;
+        ctx.lineWidth = 6;
         ctx.strokeRect(-charW/2 - 15, -fontSize + 5, charW + 20, fontSize + 10);
     } else if (styleMode === 'boxy') {
         ctx.fillStyle = '#fff';
         ctx.fillRect(-charW/2 - 5, -fontSize + 15, charW + 10, fontSize);
         ctx.strokeStyle = strokeColor;
-        ctx.lineWidth = 6;
+        ctx.lineWidth = 8;
         ctx.strokeRect(-charW/2 - 5, -fontSize + 15, charW + 10, fontSize);
     }
 
-    // 2. Prepare Fill
+    // Fill
     let activeFill: string | CanvasGradient | CanvasPattern = fillColor;
     
     if (gradientEnabled) {
@@ -261,7 +258,6 @@ export default function GraffitiTypewriterModule({ setPage }: { setPage: (p: str
     }
 
     if (patternEnabled) {
-      // Create a temporary canvas for the pattern
       const pCanvas = document.createElement('canvas');
       pCanvas.width = 10;
       pCanvas.height = 10;
@@ -280,21 +276,21 @@ export default function GraffitiTypewriterModule({ setPage }: { setPage: (p: str
 
     ctx.fillStyle = chaosMode ? `hsl(${Math.random()*360}, 100%, 50%)` : activeFill;
 
-    // 3. Shadow / Glow
+    // Shadow
     if (styleMode === 'graffiti' || styleMode === 'comic') {
       ctx.shadowColor = strokeColor;
       ctx.shadowBlur = 0;
-      ctx.shadowOffsetX = styleMode === 'comic' ? 8 : 4;
-      ctx.shadowOffsetY = styleMode === 'comic' ? 8 : 4;
+      ctx.shadowOffsetX = styleMode === 'comic' ? 12 : 6;
+      ctx.shadowOffsetY = styleMode === 'comic' ? 12 : 6;
     } else if (styleMode === 'gooey') {
       ctx.shadowColor = fillColor;
-      ctx.shadowBlur = 15;
+      ctx.shadowBlur = 20;
       ctx.shadowOffsetX = 0;
       ctx.shadowOffsetY = 0;
     }
 
-    // 4. Draw Stroke
-    ctx.lineWidth = styleMode === 'comic' ? 8 : (styleMode === 'graffiti' ? 4 : 2);
+    // Stroke
+    ctx.lineWidth = styleMode === 'comic' ? 12 : (styleMode === 'graffiti' ? 6 : 4);
     ctx.strokeStyle = strokeColor;
     ctx.lineJoin = 'round';
     
@@ -302,38 +298,35 @@ export default function GraffitiTypewriterModule({ setPage }: { setPage: (p: str
         ctx.strokeText(char.toUpperCase(), 0, 0);
     }
     
-    // 5. Draw Fill
-    ctx.shadowColor = 'transparent'; // reset shadow for fill
+    // Fill text
+    ctx.shadowColor = 'transparent';
     ctx.fillText(char.toUpperCase(), 0, 0);
     
-    // 6. Draw Accents (Swishes, Splatters, Drips)
+    // Accents
     if (swishesEnabled) {
       if (styleMode === 'graffiti' && Math.random() > 0.7) {
-        // Draw swoosh under text
         ctx.beginPath();
         ctx.moveTo(-charW/2, 10);
-        ctx.quadraticCurveTo(0, 30, charW/2, 5);
-        ctx.lineWidth = 4;
+        ctx.quadraticCurveTo(0, 40, charW/2, 5);
+        ctx.lineWidth = 6;
         ctx.strokeStyle = fillColor;
         ctx.stroke();
       }
       if (styleMode === 'gooey' && Math.random() > 0.6) {
-        // Draw drips
         ctx.fillStyle = fillColor;
         ctx.beginPath();
-        ctx.arc(0, 5, 4, 0, Math.PI*2);
+        ctx.arc(0, 10, 6, 0, Math.PI*2);
         ctx.fill();
         ctx.beginPath();
-        ctx.arc(10, 15, 3, 0, Math.PI*2);
+        ctx.arc(15, 20, 4, 0, Math.PI*2);
         ctx.fill();
       }
       if (styleMode === 'comic' && Math.random() > 0.8) {
-        // Action lines
         ctx.strokeStyle = strokeColor;
-        ctx.lineWidth = 3;
+        ctx.lineWidth = 5;
         ctx.beginPath();
-        ctx.moveTo(charW/2 + 5, -fontSize/2);
-        ctx.lineTo(charW/2 + 20, -fontSize/2 - 10);
+        ctx.moveTo(charW/2 + 10, -fontSize/2);
+        ctx.lineTo(charW/2 + 30, -fontSize/2 - 15);
         ctx.stroke();
       }
     }
@@ -341,12 +334,12 @@ export default function GraffitiTypewriterModule({ setPage }: { setPage: (p: str
     ctx.restore();
 
     // Advance cursor
-    posRef.current.x += charW + (styleMode === 'neobrutalist' ? 25 : 10);
+    posRef.current.x += charW + (styleMode === 'neobrutalist' ? 30 : 15);
     
     if (posRef.current.x > canvas.width - fontSize) {
       playBellSound();
       posRef.current.y += fontSize * 1.5;
-      posRef.current.x = 50;
+      posRef.current.x = 60;
     }
   };
 
@@ -355,7 +348,7 @@ export default function GraffitiTypewriterModule({ setPage }: { setPage: (p: str
     if (canvas) {
       const ctx = canvas.getContext('2d');
       ctx?.clearRect(0, 0, canvas.width, canvas.height);
-      posRef.current = { x: 50, y: 100 };
+      posRef.current = { x: 60, y: 120 };
       charsDrawn.current = 0;
       hasStartedTypingRef.current = false;
       setShowOverlay(true);
@@ -366,7 +359,6 @@ export default function GraffitiTypewriterModule({ setPage }: { setPage: (p: str
     const canvas = canvasRef.current;
     if (!canvas) return;
     
-    // If we want a solid background, we need to create a temporary canvas to draw the background first
     if (!transparent) {
         const tempCanvas = document.createElement('canvas');
         tempCanvas.width = canvas.width;
@@ -375,6 +367,7 @@ export default function GraffitiTypewriterModule({ setPage }: { setPage: (p: str
         if (tempCtx) {
             tempCtx.fillStyle = bgColor;
             tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+            // Replicate dot matrix on download if possible (basic approach)
             tempCtx.drawImage(canvas, 0, 0);
             
             const link = document.createElement('a');
@@ -385,61 +378,79 @@ export default function GraffitiTypewriterModule({ setPage }: { setPage: (p: str
         }
     }
 
-    // Transparent download
     const link = document.createElement('a');
     link.download = `graffiti-typewriter-transparent-${Date.now()}.png`;
     link.href = canvas.toDataURL('image/png');
     link.click();
   };
 
-  // Setup Canvas Dimensions
+  // Improved Canvas Resizing Logic
   useEffect(() => {
-    const handleResize = () => {
+    const resizeCanvas = () => {
       const canvas = canvasRef.current;
-      if (canvas && canvas.parentElement) {
-        // Save current content if any
-        const ctx = canvas.getContext('2d');
-        const tempCanvas = document.createElement('canvas');
-        tempCanvas.width = canvas.width || 1;
-        tempCanvas.height = canvas.height || 1;
-        const tempCtx = tempCanvas.getContext('2d');
-        if (tempCtx && canvas.width > 0 && canvas.height > 0) {
-            tempCtx.drawImage(canvas, 0, 0);
-        }
+      const container = containerRef.current;
+      if (canvas && container) {
+        const { clientWidth, clientHeight } = container;
+        
+        // Only resize if dimensions actually changed
+        if (canvas.width !== clientWidth || canvas.height !== clientHeight) {
+          const ctx = canvas.getContext('2d');
+          
+          // Save existing content
+          let tempCanvas: HTMLCanvasElement | null = null;
+          if (canvas.width > 0 && canvas.height > 0) {
+            tempCanvas = document.createElement('canvas');
+            tempCanvas.width = canvas.width;
+            tempCanvas.height = canvas.height;
+            const tCtx = tempCanvas.getContext('2d');
+            if (tCtx) tCtx.drawImage(canvas, 0, 0);
+          }
 
-        canvas.width = canvas.parentElement.clientWidth;
-        canvas.height = canvas.parentElement.clientHeight;
+          // Apply new dimensions
+          canvas.width = clientWidth;
+          canvas.height = clientHeight;
 
-        // Restore content
-        if (tempCanvas.width > 1 && tempCanvas.height > 1) {
-            ctx?.drawImage(tempCanvas, 0, 0);
+          // Restore content
+          if (tempCanvas && ctx) {
+            ctx.drawImage(tempCanvas, 0, 0);
+          }
         }
       }
     };
 
-    // Run after a tiny delay to ensure layout is complete
-    setTimeout(handleResize, 100);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+    
+    // Ensure fonts are loaded before we allow typing to prevent weird spacing
+    document.fonts.ready.then(() => {
+        // Ready
+    });
+
+    return () => window.removeEventListener('resize', resizeCanvas);
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
+    <div className="min-h-screen bg-white flex flex-col font-sans selection:bg-black selection:text-[#00FF66]">
       
       {/* Top Header */}
-      <header className="bg-black text-white p-4 flex items-center justify-between z-20 border-b-8 border-[#FF0055]">
+      <header className="bg-black text-white p-4 md:p-6 flex flex-col md:flex-row items-start md:items-center justify-between z-20 border-b-[12px] border-[#00E5FF] gap-4">
         <div className="flex items-center gap-4">
-          <button onClick={() => setPage('home')} className="hover:text-[#00FF66] transition-colors">
+          <button onClick={() => setPage('home')} className="bg-white text-black p-2 border-[4px] border-black hover:bg-[#FF0055] hover:text-white transition-colors shadow-[4px_4px_0_#00E5FF]">
             <ArrowLeft size={24} />
           </button>
-          <h1 className="text-2xl font-black uppercase tracking-widest"><PenTool className="inline mr-2"/> Graffiti Typewriter 2.0</h1>
+          <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tighter" style={{ textShadow: '2px 2px 0 #FF0055' }}>
+            <PenTool className="inline mr-2 mb-1" size={40} /> Typewriter
+          </h1>
         </div>
-        <div className="flex gap-2">
-            <button onClick={() => handleDownload(false)} className="bg-white text-black px-4 py-2 font-black uppercase text-sm flex items-center gap-2 hover:bg-[#00FF66] transition-colors border-2 border-black">
-                <ImageIcon size={16} /> Save BG
+        <div className="flex gap-4 w-full md:w-auto">
+            <button onClick={clearCanvas} className="flex-1 md:flex-none bg-white text-black px-4 py-2 font-black uppercase text-sm flex items-center justify-center gap-2 hover:bg-gray-200 transition-colors border-[4px] border-black shadow-[4px_4px_0_#FF0055]">
+                <Trash2 size={20} /> Clear
             </button>
-            <button onClick={() => handleDownload(true)} className="bg-[#FFFF00] text-black px-4 py-2 font-black uppercase text-sm flex items-center gap-2 hover:bg-[#00E5FF] transition-colors border-2 border-black">
-                <Download size={16} /> Save PNG
+            <button onClick={() => handleDownload(false)} className="flex-1 md:flex-none bg-[#00FF66] text-black px-4 py-2 font-black uppercase text-sm flex items-center justify-center gap-2 hover:bg-white transition-colors border-[4px] border-black shadow-[4px_4px_0_#000]">
+                <ImageIcon size={20} /> BG
+            </button>
+            <button onClick={() => handleDownload(true)} className="flex-1 md:flex-none bg-[#FFFF00] text-black px-4 py-2 font-black uppercase text-sm flex items-center justify-center gap-2 hover:bg-white transition-colors border-[4px] border-black shadow-[4px_4px_0_#000]">
+                <Download size={20} /> PNG
             </button>
         </div>
       </header>
@@ -447,16 +458,16 @@ export default function GraffitiTypewriterModule({ setPage }: { setPage: (p: str
       <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative">
         
         {/* Left Toolbar - Settings */}
-        <aside className="w-full md:w-80 bg-white border-r-4 border-black overflow-y-auto p-6 flex flex-col gap-8 z-10 custom-scrollbar">
+        <aside className="w-full md:w-[400px] bg-[#E5E5E5] border-r-[12px] border-black overflow-y-auto p-6 md:p-8 flex flex-col gap-10 z-10 custom-scrollbar shrink-0">
             
-            <section className="space-y-4">
-                <h3 className="font-black uppercase flex items-center gap-2 text-xl border-b-4 border-black pb-2"><Type size={20}/> Style Engine</h3>
-                <div className="grid grid-cols-2 gap-2">
+            <section className="space-y-6">
+                <h3 className="font-black uppercase flex items-center gap-3 text-2xl border-b-[6px] border-black pb-2 bg-white p-2 shadow-[6px_6px_0_#000] transform -rotate-1"><Type size={28}/> Style Engine</h3>
+                <div className="grid grid-cols-2 gap-3">
                     {(['graffiti', 'neobrutalist', 'gooey', 'comic', 'boxy'] as const).map(style => (
                         <button 
                             key={style}
                             onClick={() => setStyleMode(style)}
-                            className={`p-2 border-2 border-black font-black uppercase text-xs transition-all ${styleMode === style ? 'bg-black text-white shadow-[4px_4px_0_#00FF66] -translate-y-1' : 'bg-white hover:bg-gray-100 shadow-[2px_2px_0_#000]'}`}
+                            className={`p-3 border-[4px] border-black font-black uppercase text-sm transition-all ${styleMode === style ? 'bg-black text-[#00FF66] shadow-[6px_6px_0_#00E5FF] translate-x-1 translate-y-1' : 'bg-white text-black hover:bg-[#FFFF00] shadow-[6px_6px_0_#000]'}`}
                         >
                             {style}
                         </button>
@@ -464,95 +475,91 @@ export default function GraffitiTypewriterModule({ setPage }: { setPage: (p: str
                 </div>
             </section>
 
-            <section className="space-y-4">
-                <h3 className="font-black uppercase flex items-center gap-2 text-xl border-b-4 border-black pb-2"><Palette size={20}/> Color & Ink</h3>
+            <section className="space-y-6">
+                <h3 className="font-black uppercase flex items-center gap-3 text-2xl border-b-[6px] border-black pb-2 bg-white p-2 shadow-[6px_6px_0_#000] transform rotate-1"><Palette size={28}/> Inks & Canvas</h3>
                 
-                <div className="space-y-2">
-                    <label className="font-bold text-xs uppercase flex justify-between">
-                        Fill Color
-                        <input type="color" value={fillColor} onChange={e => setFillColor(e.target.value)} className="w-6 h-6 p-0 border-2 border-black cursor-pointer"/>
-                    </label>
-                </div>
-                
-                <div className="space-y-2">
-                    <label className="font-bold text-xs uppercase flex justify-between">
-                        Stroke / Shadow Color
-                        <input type="color" value={strokeColor} onChange={e => setStrokeColor(e.target.value)} className="w-6 h-6 p-0 border-2 border-black cursor-pointer"/>
-                    </label>
-                </div>
+                <div className="bg-white p-4 border-[6px] border-black shadow-[6px_6px_0_#000] space-y-4">
+                  <div className="flex items-center justify-between">
+                      <label className="font-black text-sm uppercase">Fill Color</label>
+                      <input type="color" value={fillColor} onChange={e => setFillColor(e.target.value)} className="w-12 h-12 p-0 border-[4px] border-black cursor-pointer bg-white"/>
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                      <label className="font-black text-sm uppercase">Stroke Color</label>
+                      <input type="color" value={strokeColor} onChange={e => setStrokeColor(e.target.value)} className="w-12 h-12 p-0 border-[4px] border-black cursor-pointer bg-white"/>
+                  </div>
 
-                <div className="space-y-2 pt-2">
-                    <label className="font-bold text-xs uppercase flex justify-between">
-                        Canvas Background
-                        <input type="color" value={bgColor} onChange={e => setBgColor(e.target.value)} className="w-6 h-6 p-0 border-2 border-black cursor-pointer"/>
-                    </label>
+                  <div className="flex items-center justify-between pt-4 border-t-[4px] border-black">
+                      <label className="font-black text-sm uppercase">Canvas Color</label>
+                      <input type="color" value={bgColor} onChange={e => setBgColor(e.target.value)} className="w-12 h-12 p-0 border-[4px] border-black cursor-pointer bg-white"/>
+                  </div>
                 </div>
             </section>
 
-            <section className="space-y-4">
-                <h3 className="font-black uppercase flex items-center gap-2 text-xl border-b-4 border-black pb-2"><SlidersHorizontal size={20}/> Modifiers</h3>
+            <section className="space-y-6">
+                <h3 className="font-black uppercase flex items-center gap-3 text-2xl border-b-[6px] border-black pb-2 bg-white p-2 shadow-[6px_6px_0_#000] transform -rotate-1"><SlidersHorizontal size={28}/> Modifiers</h3>
                 
-                <div className="space-y-4">
-                    <label className="flex items-center gap-3 cursor-pointer group">
-                        <div className={`w-6 h-6 border-2 border-black flex items-center justify-center transition-colors ${patternEnabled ? 'bg-[#FF0055]' : 'bg-white'}`}>
-                            {patternEnabled && <div className="w-2 h-2 bg-black rounded-full" />}
-                        </div>
-                        <span className="font-bold text-sm uppercase group-hover:text-[#FF0055] transition-colors">Dot Pattern Fill</span>
-                        <input type="checkbox" checked={patternEnabled} onChange={e => setPatternEnabled(e.target.checked)} className="hidden" />
-                    </label>
+                <div className="bg-white p-4 border-[6px] border-black shadow-[6px_6px_0_#000] space-y-6">
+                  <label className="flex items-center gap-4 cursor-pointer group">
+                      <div className={`w-8 h-8 border-[4px] border-black flex items-center justify-center transition-colors ${patternEnabled ? 'bg-[#FF0055]' : 'bg-white'}`}>
+                          {patternEnabled && <div className="w-3 h-3 bg-black rounded-full" />}
+                      </div>
+                      <span className="font-black text-lg uppercase group-hover:text-[#FF0055] transition-colors">Dot Fill</span>
+                      <input type="checkbox" checked={patternEnabled} onChange={e => setPatternEnabled(e.target.checked)} className="hidden" />
+                  </label>
 
-                    <label className="flex items-center gap-3 cursor-pointer group">
-                        <div className={`w-6 h-6 border-2 border-black flex items-center justify-center transition-colors ${gradientEnabled ? 'bg-[#00E5FF]' : 'bg-white'}`}>
-                            {gradientEnabled && <div className="w-full h-1 bg-black" />}
-                        </div>
-                        <span className="font-bold text-sm uppercase group-hover:text-[#00E5FF] transition-colors">Linear Gradient</span>
-                        <input type="checkbox" checked={gradientEnabled} onChange={e => setGradientEnabled(e.target.checked)} className="hidden" />
-                    </label>
+                  <label className="flex items-center gap-4 cursor-pointer group">
+                      <div className={`w-8 h-8 border-[4px] border-black flex items-center justify-center transition-colors ${gradientEnabled ? 'bg-[#00E5FF]' : 'bg-white'}`}>
+                          {gradientEnabled && <div className="w-full h-2 bg-black" />}
+                      </div>
+                      <span className="font-black text-lg uppercase group-hover:text-[#00E5FF] transition-colors">Gradient</span>
+                      <input type="checkbox" checked={gradientEnabled} onChange={e => setGradientEnabled(e.target.checked)} className="hidden" />
+                  </label>
 
-                    <label className="flex items-center gap-3 cursor-pointer group">
-                        <div className={`w-6 h-6 border-2 border-black flex items-center justify-center transition-colors ${swishesEnabled ? 'bg-[#FFFF00]' : 'bg-white'}`}>
-                            {swishesEnabled && <div className="w-3 h-1 bg-black transform rotate-45" />}
-                        </div>
-                        <span className="font-bold text-sm uppercase group-hover:text-[#ff9900] transition-colors">Auto-Accents (Drips/Lines)</span>
-                        <input type="checkbox" checked={swishesEnabled} onChange={e => setSwishesEnabled(e.target.checked)} className="hidden" />
-                    </label>
-                </div>
+                  <label className="flex items-center gap-4 cursor-pointer group">
+                      <div className={`w-8 h-8 border-[4px] border-black flex items-center justify-center transition-colors ${swishesEnabled ? 'bg-[#FFFF00]' : 'bg-white'}`}>
+                          {swishesEnabled && <div className="w-4 h-2 bg-black transform rotate-45" />}
+                      </div>
+                      <span className="font-black text-lg uppercase group-hover:text-[#ff9900] transition-colors">Auto-Accents</span>
+                      <input type="checkbox" checked={swishesEnabled} onChange={e => setSwishesEnabled(e.target.checked)} className="hidden" />
+                  </label>
 
-                <div className="pt-4 border-t-2 border-dashed border-gray-300">
-                    <label className="font-bold text-xs uppercase mb-2 block">Font Size ({fontSize}px)</label>
-                    <input 
-                        type="range" 
-                        min="24" max="200" 
-                        value={fontSize} 
-                        onChange={e => setFontSize(Number(e.target.value))}
-                        className="w-full accent-black"
-                    />
+                  <div className="pt-6 border-t-[4px] border-black">
+                      <label className="font-black text-sm uppercase mb-4 block">Font Size ({fontSize}px)</label>
+                      <input 
+                          type="range" 
+                          min="32" max="250" 
+                          value={fontSize} 
+                          onChange={e => setFontSize(Number(e.target.value))}
+                          className="w-full h-4 bg-black appearance-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-8 [&::-webkit-slider-thumb]:h-8 [&::-webkit-slider-thumb]:bg-[#00FF66] [&::-webkit-slider-thumb]:border-[4px] [&::-webkit-slider-thumb]:border-black cursor-pointer"
+                      />
+                  </div>
                 </div>
             </section>
 
-            <section className="space-y-4 bg-black text-white p-4 border-4 border-[#00FF66] shadow-[8px_8px_0_#FF0055]">
-                <h3 className="font-black uppercase flex items-center gap-2 text-lg text-[#00FF66]"><Wand2 size={20}/> Generative Agent</h3>
-                <p className="text-[10px] uppercase font-bold text-gray-300">Describe custom accents, swishes, or background elements.</p>
+            <section className="space-y-4 bg-black text-white p-6 border-[8px] border-[#00E5FF] shadow-[12px_12px_0_#FF0055] transform rotate-1">
+                <h3 className="font-black uppercase flex items-center gap-2 text-2xl text-[#00FF66]"><Wand2 size={28}/> Generator</h3>
+                <p className="text-xs uppercase font-bold text-gray-300">Describe custom accents or styles.</p>
                 <input 
                     type="text" 
                     value={prompt}
                     onChange={e => setPrompt(e.target.value)}
-                    placeholder="e.g. 'cyberpunk grid' or 'ink splatters'"
-                    className="w-full bg-gray-900 border-2 border-[#00FF66] p-2 text-white outline-none font-mono text-xs focus:bg-gray-800"
+                    placeholder="e.g. 'cyberpunk ink'"
+                    className="w-full bg-white border-[4px] border-black p-4 text-black font-black uppercase outline-none focus:border-[#00FF66]"
                 />
                 <button 
                     onClick={handleGenerate}
                     disabled={isGenerating || !prompt}
-                    className="w-full bg-[#00FF66] text-black font-black uppercase py-2 hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="w-full bg-[#00FF66] text-black border-[4px] border-white font-black uppercase py-4 text-lg hover:bg-[#FFFF00] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                    {isGenerating ? 'Synthesizing...' : 'Generate & Apply'}
+                    {isGenerating ? 'Synthesizing...' : 'Apply'}
                 </button>
             </section>
 
             <div className="mt-auto pt-8">
                 <button 
                     onClick={() => setChaosMode(!chaosMode)}
-                    className={`w-full py-4 font-black uppercase text-sm border-4 border-black transition-all ${chaosMode ? 'bg-red-500 text-white animate-pulse shadow-[0_0_20px_red]' : 'bg-white hover:bg-red-100 shadow-[4px_4px_0_#000]'}`}
+                    className={`w-full py-6 font-black uppercase text-xl border-[6px] border-black transition-all ${chaosMode ? 'bg-[#FF0055] text-white animate-pulse shadow-[8px_8px_0_#000]' : 'bg-white hover:bg-[#FF0055] hover:text-white shadow-[8px_8px_0_#000]'}`}
                 >
                     {chaosMode ? "Disable Chaos" : "Enable Chaos Mode"}
                 </button>
@@ -563,38 +570,38 @@ export default function GraffitiTypewriterModule({ setPage }: { setPage: (p: str
         <main className="flex-1 relative overflow-hidden flex flex-col" style={{ backgroundColor: bgColor }}>
             
             {/* Ambient background pattern for empty canvas */}
-            <div className="absolute inset-0 opacity-10 pointer-events-none mix-blend-multiply" style={{ backgroundImage: 'radial-gradient(circle, #000 2px, transparent 2.5px)', backgroundSize: '32px 32px' }} />
+            <div className="absolute inset-0 opacity-20 pointer-events-none mix-blend-multiply" style={{ backgroundImage: 'radial-gradient(circle, #000 3px, transparent 4px)', backgroundSize: '32px 32px' }} />
             
-            {/* The Canvas */}
-            <canvas 
-                ref={canvasRef}
-                className="absolute inset-0 w-full h-full cursor-text"
-                style={{ zIndex: 5 }}
-            />
-            
-            {/* Overlay UI */}
-            <div className="absolute bottom-6 right-6 z-20 flex gap-4">
-                 <button onClick={clearCanvas} className="bg-black text-white px-6 py-3 font-black uppercase text-sm hover:bg-red-500 transition-colors shadow-[6px_6px_0_#000] border-4 border-white hover:border-black">
-                    Trash It [Clear]
-                 </button>
-            </div>
+            {/* Inner frame */}
+            <div className="absolute inset-4 md:inset-8 border-[12px] border-black pointer-events-none z-10 shadow-[inset_16px_16px_0_rgba(0,0,0,0.1)]" />
 
-            {/* Instruction Overlay (fades out when typed) */}
+            {/* The Canvas */}
+            <div ref={containerRef} className="absolute inset-0 overflow-hidden">
+              <canvas 
+                  ref={canvasRef}
+                  className="absolute inset-0 cursor-text"
+                  style={{ zIndex: 5 }}
+              />
+            </div>
+            
             <AnimatePresence>
                 {showOverlay && (
                     <motion.div 
-                        initial={{ opacity: 1 }}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="absolute inset-0 flex items-center justify-center pointer-events-none z-10"
+                        className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none"
                     >
-                        <div className="bg-white/80 backdrop-blur border-8 border-black p-8 shadow-[16px_16px_0_#FF0055] text-center transform -rotate-2">
-                            <h2 className="text-4xl font-black uppercase mb-2">Start Typing</h2>
-                            <p className="font-bold text-gray-600 uppercase">Your keyboard is the spray can.</p>
+                        <div className="bg-white border-[8px] border-black p-8 md:p-12 text-center shadow-[20px_20px_0_#000] transform rotate-3">
+                            <PenTool size={64} className="mx-auto mb-6 text-[#FF0055]" />
+                            <h2 className="text-4xl md:text-6xl font-black uppercase mb-4 text-black" style={{ textShadow: '4px 4px 0 #00E5FF' }}>Start Typing</h2>
+                            <p className="text-xl font-bold uppercase text-gray-600 bg-gray-200 px-4 py-2 border-[4px] border-black inline-block transform -rotate-2">
+                                Use your keyboard.
+                            </p>
                         </div>
                     </motion.div>
                 )}
             </AnimatePresence>
-
         </main>
       </div>
     </div>

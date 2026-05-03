@@ -7,8 +7,6 @@ export const modules: ModuleMap = {
   "./components/mockups/VariantC.tsx": () => import("../components/mockups/VariantC.tsx"),
   "./components/mockups/comic-hero/Current.tsx": () => import("../components/mockups/comic-hero/Current.tsx"),
   "./components/mockups/comic-hero/SplashPage.tsx": () => import("../components/mockups/comic-hero/SplashPage.tsx"),
-  "./components/mockups/storybook-layout/StorybookA_Narrative.tsx": () => import("../components/mockups/storybook-layout/StorybookA_Narrative.tsx"),
-  "./components/mockups/storybook-layout/StorybookB_Editorial.tsx": () => import("../components/mockups/storybook-layout/StorybookB_Editorial.tsx"),
   "./components/mockups/hero-section/ApproachA_Terminal.tsx": () => import("../components/mockups/hero-section/ApproachA_Terminal.tsx"),
   "./components/mockups/hero-section/ApproachB_Canvas.tsx": () => import("../components/mockups/hero-section/ApproachB_Canvas.tsx"),
   "./components/mockups/hero-section/ApproachC_Cinematic.tsx": () => import("../components/mockups/hero-section/ApproachC_Cinematic.tsx"),
@@ -53,5 +51,7 @@ export const modules: ModuleMap = {
   "./components/mockups/hero-section/UsabilityC_Accessibility.tsx": () => import("../components/mockups/hero-section/UsabilityC_Accessibility.tsx"),
   "./components/mockups/hero-section/VibeA.tsx": () => import("../components/mockups/hero-section/VibeA.tsx"),
   "./components/mockups/hero-section/VibeB.tsx": () => import("../components/mockups/hero-section/VibeB.tsx"),
-  "./components/mockups/hero-section/VibeC.tsx": () => import("../components/mockups/hero-section/VibeC.tsx")
+  "./components/mockups/hero-section/VibeC.tsx": () => import("../components/mockups/hero-section/VibeC.tsx"),
+  "./components/mockups/storybook-layout/StorybookA_Narrative.tsx": () => import("../components/mockups/storybook-layout/StorybookA_Narrative.tsx"),
+  "./components/mockups/storybook-layout/StorybookB_Editorial.tsx": () => import("../components/mockups/storybook-layout/StorybookB_Editorial.tsx")
 };
