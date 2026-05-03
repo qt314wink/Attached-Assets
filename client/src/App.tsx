@@ -32,6 +32,9 @@ import ElementalmorphismModule from './pages/ElementalmorphismModule';
 import SovereigntyParadoxModule from './pages/SovereigntyParadoxModule';
 import GraffitiTypewriterModule from './pages/GraffitiTypewriterModule';
 import TactileSynthesisModule from './pages/TactileSynthesisModule';
+import EnigmaEngineModule from './pages/EnigmaEngineModule';
+import LiveCanvasModule from './pages/LiveCanvasModule';
+import AgencyBuilderModule from './pages/AgencyBuilderModule';
 
 const GLITCH_VARIANTS = {
   initial: { skew: 0, x: 0 },
@@ -499,6 +502,9 @@ export default function App() {
             {page === 'module-sovereignty' && <SovereigntyParadoxModule setPage={setPage} />}
             {page === 'module-graffiti' && <GraffitiTypewriterModule setPage={setPage} />}
             {page === 'module-tactile' && <TactileSynthesisModule setPage={setPage} />}
+            {page === 'module-enigma' && <EnigmaEngineModule setPage={setPage} />}
+            {page === 'module-livecanvas' && <LiveCanvasModule setPage={setPage} />}
+            {page === 'module-agency' && <AgencyBuilderModule setPage={setPage} />}
           </motion.div>
         </AnimatePresence>
       </main>

@@ -132,6 +132,36 @@ export default function Home({ setPage }: { setPage: (p: string) => void }) {
       id: "module-tactile", 
       narrative: "Vol 13: Drag & Drop Alchemy",
       desc: "Pick up the pieces. Feel the weight. Combine them in the crucible. Tactility is the new logic.",
+      span: "md:col-span-6 md:row-span-1",
+      type: "wide"
+    },
+    { 
+      title: "The Enigma Engine", 
+      icon: <BrainCircuit size={48}/>, 
+      color: "bg-[#111] text-white", 
+      id: "module-enigma", 
+      narrative: "Vol 14: The Rabbit Hole",
+      desc: "Bidirectional dialogue with the collective. Cryptic AI, pattern emergence, and scavenger hunts.",
+      span: "md:col-span-6 md:row-span-1",
+      type: "wide"
+    },
+    { 
+      title: "Live Collage Canvas", 
+      icon: <Palette size={80}/>, 
+      color: "bg-[#00E5FF]", 
+      id: "module-livecanvas", 
+      narrative: "Vol 15: Generative Community",
+      desc: "Hugging Face integration meets live art feed. Generate, remix, edit, and drag-and-drop the collective consciousness.",
+      span: "md:col-span-6 md:row-span-1",
+      type: "wide"
+    },
+    { 
+      title: "Agency Builder", 
+      icon: <Network size={80}/>, 
+      color: "bg-[#FF0055]", 
+      id: "module-agency", 
+      narrative: "Vol 16: Systems Thinking",
+      desc: "Processing modes for intake, breakdown, translation, and strategy. Lean in hard to productize ideas and create automated workflows.",
       span: "md:col-span-12 md:row-span-2",
       type: "banner"
     }
@@ -157,7 +187,7 @@ export default function Home({ setPage }: { setPage: (p: string) => void }) {
               </h2>
             </div>
             <div className="bg-black text-white font-black uppercase px-6 py-2 md:px-8 md:py-3 border-[6px] border-white shadow-[8px_8px_0_#FFFF00] transform rotate-2 mt-8 md:mt-0 text-xl md:text-2xl self-start md:self-end">
-              13 Issues Included!
+              16 Issues Included!
             </div>
           </div>
 
