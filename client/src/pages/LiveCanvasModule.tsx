@@ -67,11 +67,13 @@ export default function LiveCanvasModule({ setPage }: { setPage: (p: string) => 
     
     // Simulate API Orchestration (HuggingFace / Civitai / Design System Parsing)
     setTimeout(() => {
-      const newElements: CanvasElement[] = [
-        { id: Math.random().toString(), type: 'image', content: prompt.slice(0, 20).toUpperCase(), color: 'bg-[#00E5FF]', x: Math.random() * 300, y: Math.random() * 300, w: 350, h: 200, z: elements.length + 1, tags: ['generative', 'summoned'] },
-        { id: Math.random().toString(), type: 'text', content: "EXTRACTED INTENT", color: 'bg-[#FF9900]', x: Math.random() * 400 + 100, y: Math.random() * 300 + 100, w: 250, h: 150, z: elements.length + 2, tags: ['semantic', 'kinetic'] }
-      ];
-      setElements([...elements, ...newElements]);
+      setElements(prev => {
+        const newElements: CanvasElement[] = [
+          { id: Math.random().toString(), type: 'image', content: prompt.slice(0, 20).toUpperCase(), color: 'bg-[#00E5FF]', x: Math.random() * 300, y: Math.random() * 300, w: 350, h: 200, z: prev.length + 1, tags: ['generative', 'summoned'] },
+          { id: Math.random().toString(), type: 'text', content: "EXTRACTED INTENT", color: 'bg-[#FF9900]', x: Math.random() * 400 + 100, y: Math.random() * 300 + 100, w: 250, h: 150, z: prev.length + 2, tags: ['semantic', 'kinetic'] }
+        ];
+        return [...prev, ...newElements];
+      });
       setPrompt("");
       setIsExtracting(false);
     }, 2000);
@@ -96,31 +98,34 @@ export default function LiveCanvasModule({ setPage }: { setPage: (p: string) => 
         }
       });
       
-      const newElement: CanvasElement = {
-        id: Math.random().toString(),
-        type: 'image',
-        content: file.name.toUpperCase(),
-        color: 'bg-black text-white',
-        x: 100,
-        y: 100,
-        w: 300,
-        h: 300,
-        z: elements.length + 1,
-        tags: ['uploaded', 'reference']
-      };
-      
-      setElements([...elements, newElement]);
+      setElements(prev => {
+        const newElement: CanvasElement = {
+          id: Math.random().toString(),
+          type: 'image',
+          content: file.name.toUpperCase(),
+          color: 'bg-black text-white',
+          x: 100,
+          y: 100,
+          w: 300,
+          h: 300,
+          z: prev.length + 1,
+          tags: ['uploaded', 'reference']
+        };
+        return [...prev, newElement];
+      });
       setIsUploading(false);
     }, 2500);
   };
 
   const updateElement = (id: string, updates: Partial<CanvasElement>) => {
-    setElements(elements.map(el => el.id === id ? { ...el, ...updates } : el));
+    setElements(prev => prev.map(el => el.id === id ? { ...el, ...updates } : el));
   };
 
   const bringToFront = (id: string) => {
-    const maxZ = Math.max(...elements.map(e => e.z));
-    updateElement(id, { z: maxZ + 1 });
+    setElements(prev => {
+      const maxZ = Math.max(...prev.map(e => e.z));
+      return prev.map(el => el.id === id ? { ...el, z: maxZ + 1 } : el);
+    });
     setSelectedId(id);
   };
 
